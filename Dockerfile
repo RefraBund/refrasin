@@ -1,8 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build-stage
 
+COPY src RefraSin.sln RefraSin.sln.DotSettings Directory.Packages.props /refrasin/
 WORKDIR /refrasin
-COPY . ./
-RUN dotnet restore
 RUN dotnet publish -c Release -o /build RefraSin
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine3.18
@@ -24,7 +23,7 @@ RUN apk add \
 RUN pip install \
     jupyterlab 
     
-COPY ./docker /docker
+COPY docker /docker
     
 ENV REFRASIN_UID=1000\
     REFRASIN_GID=1000\

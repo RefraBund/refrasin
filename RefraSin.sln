@@ -1,38 +1,38 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RefraSin.Analysis", "RefraSin.Analysis\RefraSin.Analysis.fsproj", "{04942B55-D968-4A9B-92E7-6C4024964644}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RefraSin.Analysis", "src\RefraSin.Analysis\RefraSin.Analysis.fsproj", "{04942B55-D968-4A9B-92E7-6C4024964644}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Coordinates", "RefraSin.Coordinates\RefraSin.Coordinates.csproj", "{9295D188-EBFE-4D7E-9808-1D9FDDAACE5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Coordinates", "src\RefraSin.Coordinates\RefraSin.Coordinates.csproj", "{9295D188-EBFE-4D7E-9808-1D9FDDAACE5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Enumerables", "RefraSin.Enumerables\RefraSin.Enumerables.csproj", "{419166CB-1D2F-4800-9306-1725E48BD39F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Enumerables", "src\RefraSin.Enumerables\RefraSin.Enumerables.csproj", "{419166CB-1D2F-4800-9306-1725E48BD39F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Coordinates.Test", "RefraSin.Coordinates.Test\RefraSin.Coordinates.Test.csproj", "{7EC99934-5255-4A0E-B69C-57DE41F0BEA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Coordinates.Test", "src\RefraSin.Coordinates.Test\RefraSin.Coordinates.Test.csproj", "{7EC99934-5255-4A0E-B69C-57DE41F0BEA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Enumerables.Test", "RefraSin.Enumerables.Test\RefraSin.Enumerables.Test.csproj", "{5259A209-D292-420F-B61A-44D95EDD70FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Enumerables.Test", "src\RefraSin.Enumerables.Test\RefraSin.Enumerables.Test.csproj", "{5259A209-D292-420F-B61A-44D95EDD70FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Storage", "RefraSin.Storage\RefraSin.Storage.csproj", "{50FE80D5-0B7C-4ED4-95DF-B791CF05D23C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Storage", "src\RefraSin.Storage\RefraSin.Storage.csproj", "{50FE80D5-0B7C-4ED4-95DF-B791CF05D23C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ParticleModel", "RefraSin.ParticleModel\RefraSin.ParticleModel.csproj", "{B32E8C4B-B3EA-4D83-9E05-34DB252CF43E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ParticleModel", "src\RefraSin.ParticleModel\RefraSin.ParticleModel.csproj", "{B32E8C4B-B3EA-4D83-9E05-34DB252CF43E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.MaterialData", "RefraSin.MaterialData\RefraSin.MaterialData.csproj", "{C028725B-30D7-44FA-83AB-5A947A113077}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.MaterialData", "src\RefraSin.MaterialData\RefraSin.MaterialData.csproj", "{C028725B-30D7-44FA-83AB-5A947A113077}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.TEPSolver", "RefraSin.TEPSolver\RefraSin.TEPSolver.csproj", "{8A5C535F-D697-4C10-BEB5-D5722AACDE00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.TEPSolver", "src\RefraSin.TEPSolver\RefraSin.TEPSolver.csproj", "{8A5C535F-D697-4C10-BEB5-D5722AACDE00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ParticleModel.Test", "RefraSin.ParticleModel.Test\RefraSin.ParticleModel.Test.csproj", "{6B6FA91D-C6A0-45C8-B722-4B5868A4EA73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ParticleModel.Test", "src\RefraSin.ParticleModel.Test\RefraSin.ParticleModel.Test.csproj", "{6B6FA91D-C6A0-45C8-B722-4B5868A4EA73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refrasin.Hdf5Storage", "Refrasin.Hdf5Storage\Refrasin.Hdf5Storage.csproj", "{7116BF2A-8533-4C5F-AFC7-5B005EFC6C88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Refrasin.Hdf5Storage", "src\Refrasin.Hdf5Storage\Refrasin.Hdf5Storage.csproj", "{7116BF2A-8533-4C5F-AFC7-5B005EFC6C88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Hdf5Storage.Test", "RefraSin.Hdf5Storage.Test\RefraSin.Hdf5Storage.Test.csproj", "{E1DF96B4-759A-43EE-A04C-3F354CF26152}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Hdf5Storage.Test", "src\RefraSin.Hdf5Storage.Test\RefraSin.Hdf5Storage.Test.csproj", "{E1DF96B4-759A-43EE-A04C-3F354CF26152}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.TEPSolver.Test", "RefraSin.TEPSolver.Test\RefraSin.TEPSolver.Test.csproj", "{627870BA-9F85-495B-86AE-1FEDC7F47D9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.TEPSolver.Test", "src\RefraSin.TEPSolver.Test\RefraSin.TEPSolver.Test.csproj", "{627870BA-9F85-495B-86AE-1FEDC7F47D9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ProcessModel", "RefraSin.ProcessModel\RefraSin.ProcessModel.csproj", "{D8938CCB-4045-46E2-A46D-832F0541FD8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.ProcessModel", "src\RefraSin.ProcessModel\RefraSin.ProcessModel.csproj", "{D8938CCB-4045-46E2-A46D-832F0541FD8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Graphs", "RefraSin.Graphs\RefraSin.Graphs.csproj", "{24385645-EC6B-46D4-98D0-CF5612AED935}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Graphs", "src\RefraSin.Graphs\RefraSin.Graphs.csproj", "{24385645-EC6B-46D4-98D0-CF5612AED935}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Graphs.Tests", "RefraSin.Graphs.Tests\RefraSin.Graphs.Tests.csproj", "{EC11CBB1-3A32-4BE5-955A-FDCB10B4C16C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin.Graphs.Tests", "src\RefraSin.Graphs.Tests\RefraSin.Graphs.Tests.csproj", "{EC11CBB1-3A32-4BE5-955A-FDCB10B4C16C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin", "RefraSin\RefraSin.csproj", "{1B21B571-1143-4B9E-AF50-B0EF4A38FD56}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RefraSin", "src\RefraSin\RefraSin.csproj", "{1B21B571-1143-4B9E-AF50-B0EF4A38FD56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

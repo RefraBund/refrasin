@@ -1,7 +1,5 @@
 #!/usr/bin/xonsh
 
-print("Starting RefraSin Jupyter Server...")
-
 import sys
 
 $RAISE_SUBPROC_ERROR = True
