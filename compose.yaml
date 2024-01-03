@@ -1,0 +1,12 @@
+version: "2"
+
+services: 
+  refrasin:
+    build: .
+    ports:
+      - "8888:8888"
+    volumes:
+      - "./notebooks:/userfiles"
+    environment:
+      REFRASIN_UID: 1001
+      REFRASIN_GID: 1001
