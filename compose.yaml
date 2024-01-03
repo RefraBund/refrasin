@@ -8,5 +8,5 @@ services:
     volumes:
       - "./notebooks:/userfiles"
     environment:
-      REFRASIN_UID: 1001
-      REFRASIN_GID: 1001
+      REFRASIN_UID: 1000
+      REFRASIN_GID: 1000

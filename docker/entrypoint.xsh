@@ -1,4 +1,6 @@
-#! /bin/env xonsh
+#!/usr/bin/xonsh
+
+print("Starting RefraSin Jupyter Server...")
 
 import sys
 
@@ -12,6 +14,6 @@ if ($REFRASIN_GID is not None) and ($REFRASIN_GID != $ORIG_REFRASIN_GID):
     groupmod -o -g @($REFRASIN_GID) refrasin
     print("Running now with GID", $(id -g refrasin))
 
-su refrasin
+chown refrasin:refrasin .
 
-jupyter lab @($ARGS)
+gosu refrasin @($ARGS[1:])
