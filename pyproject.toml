@@ -1,0 +1,52 @@
+[build-system]
+requires = [
+    "hatchling",
+    "hatch-build-scripts",
+    "hatch-autorun"
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "refrasin"
+dynamic = ["version"]
+description = 'Python bindings to RefraSin using Python.NET'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+    { name = "Max Weiner", email = "max.weiner@imf.tu-freiberg.de" },
+]
+classifiers = [
+]
+dependencies = [
+    "pythonnet ~= 3.0"
+]
+
+[project.urls]
+Documentation = "https://github.com/refrabund/refrasin#readme"
+Issues = "https://github.com/refrabund/refrasin/issues"
+Source = "https://github.com/refrabund/refrasin"
+
+[tool.hatch.version]
+path = "refrasin/__init__.py"
+
+[tool.hatch.envs.default]
+path = ".venv"
+
+[tool.hatch.build]
+packages = ["refrasin"]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+commands = [
+    "dotnet publish -c Release -o . ../",
+    ""
+]
+artifacts = [
+    "assemblies.zip"
+]
+work_dir = "build"
+out_dir = "refrasin/res"
+
+[tool.hatch.build.hooks.autorun]
+file = "refrasin/autorun.py"
