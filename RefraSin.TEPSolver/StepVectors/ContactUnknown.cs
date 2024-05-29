@@ -4,5 +4,6 @@ public enum ContactUnknown
 {
     RadialDisplacement,
     AngleDisplacement,
-    RotationDisplacement
+    RotationDisplacement,
+    LambdaRotation
 }

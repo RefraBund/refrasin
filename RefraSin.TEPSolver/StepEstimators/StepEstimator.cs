@@ -32,9 +32,10 @@ class StepEstimator : IStepEstimator
     {
         foreach (var contact in currentState.Contacts)
         {
+            yield return contact.FromNodes.Average(GuessNormalDisplacement) + contact.ToNodes.Average(GuessNormalDisplacement);
             yield return 0;
             yield return 0;
-            yield return 0;
+            yield return 1;
 
             foreach (var node in contact.FromNodes)
             {
@@ -96,6 +97,6 @@ class StepEstimator : IStepEstimator
       / Math.Pow(node.SurfaceDistance.ToUpper, 2);
 
     private static double GuessVacancyConcentration(NodeBase node) =>
-        (node is not NeckNode ? node.GibbsEnergyGradient.Normal : node.GibbsEnergyGradient.Normal)
+        (node is not NeckNode ? node.GibbsEnergyGradient.Normal : -Math.Abs(node.GibbsEnergyGradient.Tangential))
       / node.Particle.VacancyVolumeEnergy;
 }

@@ -57,7 +57,10 @@ public static class Lagrangian
     {
         foreach (var node in nodes)
         {
-            yield return StateVelocityDerivativeNormal(stepVector, node);
+            if (node is NeckNode neckNode)
+                yield return StateVelocityDerivativeTangential(stepVector, neckNode);
+            else
+                yield return StateVelocityDerivativeNormal(stepVector, node);
             yield return FluxDerivative(stepVector, node);
             yield return RequiredConstraint(stepVector, node);
         }
@@ -86,8 +89,8 @@ public static class Lagrangian
 
             if (contactNode is NeckNode neckNode)
             {
-                yield return StateVelocityDerivativeTangential(stepVector, neckNode);
-                yield return StateVelocityDerivativeTangential(stepVector, neckNode.ContactedNode);
+                yield return StateVelocityDerivativeNormal(stepVector, neckNode);
+                yield return StateVelocityDerivativeNormal(stepVector, neckNode.ContactedNode);
             }
         }
     }
@@ -100,6 +103,7 @@ public static class Lagrangian
         yield return ParticleRadialDisplacementDerivative(stepVector, contact);
         yield return ParticleAngleDisplacementDerivative(stepVector, contact);
         yield return ParticleRotationDerivative(stepVector, contact);
+        yield return stepVector.RotationDisplacement(contact) - stepVector.AngleDisplacement(contact);
     }
 
     private static double ParticleRadialDisplacementDerivative(
@@ -110,7 +114,7 @@ public static class Lagrangian
     private static double ParticleAngleDisplacementDerivative(
         StepVector stepVector,
         ParticleContact contact
-    ) => contact.FromNodes.Sum(stepVector.LambdaContactDirection);
+    ) => contact.FromNodes.Sum(stepVector.LambdaContactDirection) - stepVector.LambdaRotation(contact);
 
     private static double ParticleRotationDerivative(
         StepVector stepVector,
@@ -124,7 +128,7 @@ public static class Lagrangian
           / contact.Distance
           * Cos(n.ContactedNode.AngleDistanceFromContactDirection)
           * stepVector.LambdaContactDirection(n)
-        );
+        ) + stepVector.LambdaRotation(contact);
 
     public static IEnumerable<double> YieldParticleEquations(
         Particle particle,

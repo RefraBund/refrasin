@@ -59,7 +59,7 @@ public static class Jacobian
     ) =>
         contact.FromNodes.Select(node =>
             (stepVector.StepVectorMap[node, NodeUnknown.LambdaContactDirection], 1.0)
-        );
+        ).Append((stepVector.StepVectorMap[contact, ContactUnknown.LambdaRotation], -1.0));
 
     private static JacobianRow ParticleRotationDerivative(
         StepVector stepVector,
@@ -80,6 +80,8 @@ public static class Jacobian
               * Cos(node.ContactedNode.AngleDistanceFromContactDirection)
             );
         }
+
+        yield return (stepVector.StepVectorMap[contact, ContactUnknown.LambdaRotation], 1.0);
     }
 
     public static JacobianRows YieldParticleEquations(
@@ -92,16 +94,16 @@ public static class Jacobian
 
     private static JacobianRow StateVelocityDerivativeTangential(
         StepVector stepVector,
-        ContactNodeBase node
+        NeckNode node
     )
     {
-        yield return (
-            stepVector.StepVectorMap[node, NodeUnknown.LambdaContactDistance],
-            -node.ContactDistanceGradient.Tangential
+       yield return (
+            stepVector.StepVectorMap[node, NodeUnknown.LambdaVolume],
+            node.VolumeGradient.Tangential
         );
         yield return (
-            stepVector.StepVectorMap[node, NodeUnknown.LambdaContactDirection],
-            -node.ContactDirectionGradient.Tangential
+            stepVector.StepVectorMap[node.Particle, ParticleUnknown.LambdaDissipation],
+            -node.GibbsEnergyGradient.Tangential
         );
     }
 
@@ -112,10 +114,16 @@ public static class Jacobian
     {
         foreach (var node in particle.Nodes)
         {
-            yield return (
-                stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
-                -node.GibbsEnergyGradient.Normal
-            );
+            if (node is INeckNode)
+                yield return (
+                    stepVector.StepVectorMap[node, NodeUnknown.TangentialDisplacement],
+                    -node.GibbsEnergyGradient.Tangential
+                );
+            else
+                yield return (
+                    stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
+                    -node.GibbsEnergyGradient.Normal
+                );
             yield return (
                 stepVector.StepVectorMap[node, NodeUnknown.FluxToUpper],
                 -2
@@ -143,12 +151,12 @@ public static class Jacobian
         if (node is NeckNode)
         {
             yield return (
-                stepVector.StepVectorMap[node, NodeUnknown.TangentialDisplacement],
-                -node.ContactDistanceGradient.Tangential
+                stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
+                -node.ContactDistanceGradient.Normal
             );
             yield return (
-                stepVector.StepVectorMap[node.ContactedNode, NodeUnknown.TangentialDisplacement],
-                -node.ContactedNode.ContactDistanceGradient.Tangential
+                stepVector.StepVectorMap[node.ContactedNode, NodeUnknown.NormalDisplacement],
+                -node.ContactedNode.ContactDistanceGradient.Normal
             );
         }
     }
@@ -170,12 +178,12 @@ public static class Jacobian
         if (node is NeckNode)
         {
             yield return (
-                stepVector.StepVectorMap[node, NodeUnknown.TangentialDisplacement],
-                -node.ContactDirectionGradient.Tangential
+                stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
+                -node.ContactDirectionGradient.Normal
             );
             yield return (
-                stepVector.StepVectorMap[node.ContactedNode, NodeUnknown.TangentialDisplacement],
-                -node.ContactedNode.ContactDirectionGradient.Tangential
+                stepVector.StepVectorMap[node.ContactedNode, NodeUnknown.NormalDisplacement],
+                -node.ContactedNode.ContactDirectionGradient.Normal
             );
         }
     }
@@ -192,8 +200,8 @@ public static class Jacobian
 
             if (contactNode is NeckNode neckNode)
             {
-                yield return StateVelocityDerivativeTangential(stepVector, neckNode);
-                yield return StateVelocityDerivativeTangential(stepVector, neckNode.ContactedNode);
+                yield return StateVelocityDerivativeNormalBorder(stepVector, neckNode);
+                yield return StateVelocityDerivativeNormalBorder(stepVector, neckNode.ContactedNode);
             }
         }
     }
@@ -203,6 +211,12 @@ public static class Jacobian
         yield return ParticleRadialDisplacementDerivative(stepVector, contact);
         yield return ParticleAngleDisplacementDerivative(stepVector, contact);
         yield return ParticleRotationDerivative(stepVector, contact);
+
+        yield return new[]
+        {
+            (stepVector.StepVectorMap[contact, ContactUnknown.AngleDisplacement], -1.0),
+            (stepVector.StepVectorMap[contact, ContactUnknown.RotationDisplacement], 1.0)
+        };
     }
 
     public static Matrix<double> ParticleBlock(
@@ -236,7 +250,11 @@ public static class Jacobian
     {
         foreach (var node in nodes)
         {
-            yield return StateVelocityDerivativeNormal(stepVector, node);
+            if (node is NeckNode neckNode)
+                yield return StateVelocityDerivativeTangential(stepVector, neckNode);
+            else
+                yield return StateVelocityDerivativeNormal(stepVector, node);
+
             yield return FluxDerivative(stepVector, node);
             yield return RequiredConstraint(stepVector, node);
         }
@@ -254,6 +272,21 @@ public static class Jacobian
         yield return (
             stepVector.StepVectorMap[node.Particle, ParticleUnknown.LambdaDissipation],
             -node.GibbsEnergyGradient.Normal
+        );
+    }
+    
+    private static JacobianRow StateVelocityDerivativeNormalBorder(
+        StepVector stepVector,
+        NeckNode node
+    )
+    {
+        yield return (
+            stepVector.StepVectorMap[node, NodeUnknown.LambdaContactDistance],
+            -node.ContactDistanceGradient.Normal
+        );
+        yield return (
+            stepVector.StepVectorMap[node, NodeUnknown.LambdaContactDirection],
+            -node.ContactDirectionGradient.Normal
         );
     }
 
@@ -279,10 +312,16 @@ public static class Jacobian
         NodeBase node
     )
     {
-        yield return (
-            stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
-            node.VolumeGradient.Normal
-        );
+        if (node is INeckNode)
+            yield return (
+                stepVector.StepVectorMap[node, NodeUnknown.TangentialDisplacement],
+                node.VolumeGradient.Tangential
+            );
+        else
+            yield return (
+                stepVector.StepVectorMap[node, NodeUnknown.NormalDisplacement],
+                node.VolumeGradient.Normal
+            );
         yield return (stepVector.StepVectorMap[node, NodeUnknown.FluxToUpper], -1);
         yield return (stepVector.StepVectorMap[node.Lower, NodeUnknown.FluxToUpper], 1);
     }

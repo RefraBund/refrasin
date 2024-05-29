@@ -16,7 +16,11 @@ public class StepVectorMap
             {
                 AddNodeUnknown(node, NodeUnknown.LambdaVolume);
                 AddNodeUnknown(node, NodeUnknown.FluxToUpper);
-                AddNodeUnknown(node, NodeUnknown.NormalDisplacement);
+
+                if (node is INeckNode)
+                    AddNodeUnknown(node, NodeUnknown.TangentialDisplacement);
+                else
+                    AddNodeUnknown(node, NodeUnknown.NormalDisplacement);
             }
 
             AddParticleUnknown(particle, ParticleUnknown.LambdaDissipation);
@@ -31,23 +35,24 @@ public class StepVectorMap
             AddContactUnknown(contact, ContactUnknown.RadialDisplacement);
             AddContactUnknown(contact, ContactUnknown.AngleDisplacement);
             AddContactUnknown(contact, ContactUnknown.RotationDisplacement);
+            AddContactUnknown(contact, ContactUnknown.LambdaRotation);
 
             foreach (var contactNode in contact.FromNodes)
             {
                 AddNodeUnknown(contactNode, NodeUnknown.LambdaContactDistance);
                 AddNodeUnknown(contactNode, NodeUnknown.LambdaContactDirection);
-                
-                if (contactNode is ParticleModel.NeckNode)
-                    AddNodeUnknown(contactNode, NodeUnknown.TangentialDisplacement);
+
+                if (contactNode is INeckNode)
+                    AddNodeUnknown(contactNode, NodeUnknown.NormalDisplacement);
             }
 
             foreach (var contactNode in contact.ToNodes)
             {
                 LinkCommonNodeUnknown(contactNode, NodeUnknown.LambdaContactDistance);
                 LinkCommonNodeUnknown(contactNode, NodeUnknown.LambdaContactDirection);
-                
-                if (contactNode is ParticleModel.NeckNode)
-                    AddNodeUnknown(contactNode, NodeUnknown.TangentialDisplacement);
+
+                if (contactNode is INeckNode)
+                    AddNodeUnknown(contactNode, NodeUnknown.NormalDisplacement);
             }
         }
 

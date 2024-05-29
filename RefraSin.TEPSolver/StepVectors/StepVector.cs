@@ -52,6 +52,11 @@ public class StepVector : DenseVector
 
     public double RotationDisplacement(IParticle from, IParticle to) =>
         this[StepVectorMap[from.Id, to.Id, ContactUnknown.RotationDisplacement]];
+    public double LambdaRotation(IParticleContact contact) =>
+        this[StepVectorMap[contact.From.Id, contact.To.Id, ContactUnknown.LambdaRotation]];
+
+    public double LambdaRotation(IParticle from, IParticle to) =>
+        this[StepVectorMap[from.Id, to.Id, ContactUnknown.LambdaRotation]];
 
     public static StepVector operator +(StepVector leftSide, StepVector rightSide) => new((DenseVector)leftSide + rightSide, leftSide.StepVectorMap);
     public static StepVector operator -(StepVector leftSide, StepVector rightSide) => new((DenseVector)leftSide - rightSide, leftSide.StepVectorMap);
