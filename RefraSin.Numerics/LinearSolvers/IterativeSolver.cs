@@ -4,8 +4,11 @@ using MathNet.Numerics.LinearAlgebra.Solvers;
 
 namespace RefraSin.Numerics.LinearSolvers;
 
-public class IterativeSolver(IIterativeSolver<double> solver, Iterator<double> iterator, IPreconditioner<double> preconditioner)
-    : ILinearSolver
+public class IterativeSolver(
+    IIterativeSolver<double> solver,
+    Iterator<double> iterator,
+    IPreconditioner<double> preconditioner
+) : ILinearSolver
 {
     public IIterativeSolver<double> Solver { get; } = solver;
 
@@ -14,10 +17,16 @@ public class IterativeSolver(IIterativeSolver<double> solver, Iterator<double> i
     public IPreconditioner<double> Preconditioner { get; } = preconditioner;
 
     /// <inheritdoc />
-    public Vector<double> Solve(Matrix<double> matrix, Vector<double> rightSide)
+    public Vector<double> Solve(
+        Matrix<double> matrix,
+        Vector<double> rightSide,
+        Vector<double>? initialGuess = null
+    )
     {
         Iterator.Reset();
-        var sol = Vector<double>.Build.Dense(rightSide.Count);
+        var sol = initialGuess is null
+            ? Vector<double>.Build.Dense(rightSide.Count)
+            : Vector<double>.Build.DenseOfVector(initialGuess);
         Solver.Solve(matrix, rightSide, sol, Iterator, Preconditioner);
 
         return sol;
