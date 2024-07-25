@@ -34,7 +34,7 @@ public class KaczmarzSolver(
             .ToArray();
 
         var solutionVector = initialGuess is null
-            ? Vector<double>.Build.Dense(rightSide.Count)
+            ? Vector<double>.Build.Dense(matrix.ColumnCount)
             : Vector<double>.Build.DenseOfVector(initialGuess);
         var stepSizes = matrix
             .EnumerateRows()

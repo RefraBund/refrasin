@@ -38,6 +38,10 @@ public class LinearSolverTest
             Matrix<double>.Build.Random(1000, 1000, 123456).ToArray(),
             Vector<double>.Build.Random(1000, 123456).ToArray()
         );
+        yield return new TestFixtureData(
+            Matrix<double>.Build.Random(100, 50, 123456).ToArray(),
+            Vector<double>.Build.Random(50, 123456).ToArray()
+        );
     }
 
     private Matrix<double> _systemMatrix;
