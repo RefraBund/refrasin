@@ -12,7 +12,7 @@ public class KaczmarzSolver(
     int randomSeed = 980323704,
     int maximumEpochCount = 1000,
     double precision = 1e-8,
-    double stepBreakFactor = 0.5,
+    double stepBreakFactor = 1,
     KaczmarzSolver.IWeightingMatrixFactory? weightingMatrixFactory = null
 ) : ILinearSolver
 {
@@ -44,7 +44,6 @@ public class KaczmarzSolver(
         for (epoch = 0; epoch < MaximumEpochCount; epoch++)
         {
             int randomEquation = randomSource.Next(matrix.RowCount);
-            randomEquation = 0;
 
             for (var use = 0; use < equationCount; use++)
             {
@@ -106,5 +105,19 @@ public class KaczmarzSolver(
                 systemMatrix.RowCount,
                 1.0 / systemMatrix.RowCount
             );
+    }
+
+    public class RowNormWeightingMatrixFactory : IWeightingMatrixFactory
+    {
+        /// <inheritdoc />
+        public Matrix<double> Compute(Matrix<double> systemMatrix, Vector<double> rightSide)
+        {
+            var systemNorm = systemMatrix.L2Norm();
+            var weights = Vector<double>.Build.DenseOfEnumerable(
+                systemMatrix.EnumerateRows().Select(r => r.L2Norm() / systemNorm)
+            );
+
+            return Matrix<double>.Build.DenseOfRowVectors(Enumerable.Repeat(weights, systemMatrix.RowCount));
+        }
     }
 }

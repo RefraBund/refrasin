@@ -25,7 +25,7 @@ public class IterativeSolver(
     {
         Iterator.Reset();
         var sol = initialGuess is null
-            ? Vector<double>.Build.Dense(rightSide.Count)
+            ? Vector<double>.Build.Dense(matrix.ColumnCount)
             : Vector<double>.Build.DenseOfVector(initialGuess);
         Solver.Solve(matrix, rightSide, sol, Iterator, Preconditioner);
 

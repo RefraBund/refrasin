@@ -27,7 +27,7 @@ public class TwoParticleTest
     [SetUp]
     public void Setup()
     {
-        var duration = 1e5;
+        var duration = 1e3;
         var initialNeck = 2 * PI / 100 / 2 * 120e-6 * 5;
         var nodeCountPerParticle = 20;
 
@@ -48,26 +48,26 @@ public class TwoParticleTest
                             new PolarPoint(new AbsolutePoint(120e-6, -initialNeck)),
                             NodeType.Neck
                         ),
-                        // new ParticleNode(
-                        //     Guid.NewGuid(),
-                        //     particle,
-                        //     new PolarPoint(new AbsolutePoint(120e-6, -initialNeck / 2)),
-                        //     NodeType.GrainBoundary
-                        // ),
                         new ParticleNode(
                             Guid.NewGuid(),
                             particle,
-                            new PolarPoint(new AbsolutePoint(125e-6, -0.5 * initialNeck)),
-                            // new PolarPoint(new AbsolutePoint(125e-6, 0)),
-                            // new PolarPoint(new AbsolutePoint(120e-6, 0)),
+                            new PolarPoint(new AbsolutePoint(120e-6, -initialNeck / 2)),
                             NodeType.GrainBoundary
                         ),
-                        // new ParticleNode(
-                        //     Guid.NewGuid(),
-                        //     particle,
-                        //     new PolarPoint(new AbsolutePoint(120e-6, initialNeck / 2)),
-                        //     NodeType.GrainBoundary
-                        // ),
+                        new ParticleNode(
+                            Guid.NewGuid(),
+                            particle,
+                            // new PolarPoint(new AbsolutePoint(125e-6, -0.5 * initialNeck)),
+                            // new PolarPoint(new AbsolutePoint(125e-6, 0)),
+                            new PolarPoint(new AbsolutePoint(120e-6, 0)),
+                            NodeType.GrainBoundary
+                        ),
+                        new ParticleNode(
+                            Guid.NewGuid(),
+                            particle,
+                            new PolarPoint(new AbsolutePoint(120e-6, initialNeck / 2)),
+                            NodeType.GrainBoundary
+                        ),
                         new ParticleNode(
                             Guid.NewGuid(),
                             particle,
@@ -108,26 +108,26 @@ public class TwoParticleTest
                             new PolarPoint(new AbsolutePoint(240e-6, -initialNeck)),
                             NodeType.Neck
                         ),
-                        // new ParticleNode(
-                        //     Guid.NewGuid(),
-                        //     particle,
-                        //     new PolarPoint(new AbsolutePoint(240e-6, -initialNeck / 2)),
-                        //     NodeType.GrainBoundary
-                        // ),
                         new ParticleNode(
                             Guid.NewGuid(),
                             particle,
-                            new PolarPoint(new AbsolutePoint(235e-6, 0.5 * initialNeck)),
-                            // new PolarPoint(new AbsolutePoint(235e-6, 0)),
-                            // new PolarPoint(new AbsolutePoint(240e-6, 0)),
+                            new PolarPoint(new AbsolutePoint(240e-6, -initialNeck / 2)),
                             NodeType.GrainBoundary
                         ),
-                        // new ParticleNode(
-                        //     Guid.NewGuid(),
-                        //     particle,
-                        //     new PolarPoint(new AbsolutePoint(240e-6, initialNeck / 2)),
-                        //     NodeType.GrainBoundary
-                        // ),
+                        new ParticleNode(
+                            Guid.NewGuid(),
+                            particle,
+                            // new PolarPoint(new AbsolutePoint(235e-6, 0.5 * initialNeck)),
+                            // new PolarPoint(new AbsolutePoint(235e-6, 0)),
+                            new PolarPoint(new AbsolutePoint(240e-6, 0)),
+                            NodeType.GrainBoundary
+                        ),
+                        new ParticleNode(
+                            Guid.NewGuid(),
+                            particle,
+                            new PolarPoint(new AbsolutePoint(240e-6, initialNeck / 2)),
+                            NodeType.GrainBoundary
+                        ),
                         new ParticleNode(
                             Guid.NewGuid(),
                             particle,

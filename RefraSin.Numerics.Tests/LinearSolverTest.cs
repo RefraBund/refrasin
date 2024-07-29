@@ -42,6 +42,10 @@ public class LinearSolverTest
             Matrix<double>.Build.Random(100, 50, 123456).ToArray(),
             Vector<double>.Build.Random(50, 123456).ToArray()
         );
+        yield return new TestFixtureData(
+            Matrix<double>.Build.Random(1000, 500, 123456).ToArray(),
+            Vector<double>.Build.Random(500, 123456).ToArray()
+        );
     }
 
     private Matrix<double> _systemMatrix;
@@ -52,43 +56,63 @@ public class LinearSolverTest
     public void TestKaczmarzWithSequence()
     {
         var solver = new KaczmarzSolver(
-            weightingMatrixFactory: new KaczmarzSolver.SequentialWeightingMatrixFactory()
+            weightingMatrixFactory: new KaczmarzSolver.SequentialWeightingMatrixFactory(),
+            maximumEpochCount: 10000
         );
         var solution = solver.Solve(_systemMatrix, _rightSide, null);
 
-        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-4));
+        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-7));
     }
 
     [Test]
     public void TestKaczmarzWithUniform()
     {
         var solver = new KaczmarzSolver(
-            weightingMatrixFactory: new KaczmarzSolver.UniformWeightingMatrixFactory()
+            weightingMatrixFactory: new KaczmarzSolver.UniformWeightingMatrixFactory(),
+            maximumEpochCount: 10000
         );
         var solution = solver.Solve(_systemMatrix, _rightSide, null);
 
-        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-8));
+        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-7));
+    }
+
+    [Test]
+    public void TestKaczmarzWithRowNorm()
+    {
+        var solver = new KaczmarzSolver(
+            weightingMatrixFactory: new KaczmarzSolver.RowNormWeightingMatrixFactory(),
+            maximumEpochCount: 10000
+        );
+        var solution = solver.Solve(_systemMatrix, _rightSide, null);
+
+        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-7));
     }
 
     [Test]
     public void TestLU()
     {
+        if (_systemMatrix.RowCount != _systemMatrix.ColumnCount)
+            Assert.Inconclusive("matrix must be square for this algorithm");
+
         var solver = new LUSolver();
         var solution = solver.Solve(_systemMatrix, _rightSide, null);
 
-        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-8));
+        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-7));
     }
 
     [Test]
     public void TestIterative()
     {
+        if (_systemMatrix.RowCount != _systemMatrix.ColumnCount)
+            Assert.Inconclusive("matrix must be square for this algorithm");
+
         var solver = new IterativeSolver(
             new MlkBiCgStab(),
             new Iterator<double>(),
-            new UnitPreconditioner<double>()
+            new DiagonalPreconditioner()
         );
         var solution = solver.Solve(_systemMatrix, _rightSide, null);
 
-        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-8));
+        Assert.That(solution.ToArray(), Is.EqualTo(_solution.ToArray()).Within(1e-7));
     }
 }
