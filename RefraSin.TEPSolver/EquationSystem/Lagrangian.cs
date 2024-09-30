@@ -154,7 +154,7 @@ public static class Lagrangian
               * stepVector.LambdaContactDistance(contactNode)
               + contactNode.ContactDirectionGradient.Normal
               * stepVector.LambdaContactDirection(contactNode)
-              - contactNode.TorqueLeverArm.Normal * stepVector.LambdaContactRotation(contactNode.Contact);
+              - contactNode.TorqueLeverArm.Normal * stepVector.LambdaContactTorque(contactNode.Contact);
         }
 
         return -gibbsTerm + requiredConstraintsTerm - contactTerm;
@@ -169,7 +169,7 @@ public static class Lagrangian
         var contactTerm =
             node.ContactDistanceGradient.Tangential * stepVector.LambdaContactDistance(node)
           + node.ContactDirectionGradient.Tangential * stepVector.LambdaContactDirection(node)
-          - node.TorqueLeverArm.Tangential * stepVector.LambdaContactRotation(node.Contact);
+          - node.TorqueLeverArm.Tangential * stepVector.LambdaContactTorque(node.Contact);
 
         return -gibbsTerm + requiredConstraintsTerm - contactTerm;
     }

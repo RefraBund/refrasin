@@ -35,7 +35,9 @@ public class StepVectorMap
             AddUnknown(contact.MergedId, Unknown.RadialDisplacement);
             AddUnknown(contact.MergedId, Unknown.AngleDisplacement);
             AddUnknown(contact.MergedId, Unknown.RotationDisplacement);
-            AddUnknown(contact.MergedId, Unknown.LambdaContactRotation);
+            AddUnknown(contact.MergedId, Unknown.LambdaContactNormalForce);
+            AddUnknown(contact.MergedId, Unknown.LambdaContactTangetialForce);
+            AddUnknown(contact.MergedId, Unknown.LambdaContactTorque);
 
             foreach (var contactNode in contact.FromNodes)
             {
@@ -102,7 +104,11 @@ public class StepVectorMap
 
     public int LambdaContactDirection(INode node) => _indices[(node.Id, Unknown.LambdaContactDirection)];
     
-    public int LambdaContactRotation(ParticleContact contact) => _indices[(contact.MergedId, Unknown.LambdaContactRotation)];
+    public int LambdaContactNormalForce(ParticleContact contact) => _indices[(contact.MergedId, Unknown.LambdaContactNormalForce)];
+    
+    public int LambdaContactTangentialForce(ParticleContact contact) => _indices[(contact.MergedId, Unknown.LambdaContactTangetialForce)];
+    
+    public int LambdaContactTorque(ParticleContact contact) => _indices[(contact.MergedId, Unknown.LambdaContactTorque)];
 
     public int RadialDisplacement(ParticleContact contact) => _indices[(contact.MergedId, Unknown.RadialDisplacement)];
 
@@ -118,7 +124,9 @@ public class StepVectorMap
         LambdaVolume,
         LambdaContactDistance,
         LambdaContactDirection,
-        LambdaContactRotation,
+        LambdaContactNormalForce,
+        LambdaContactTangetialForce,
+        LambdaContactTorque,
         RadialDisplacement,
         AngleDisplacement,
         RotationDisplacement,

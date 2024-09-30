@@ -46,7 +46,9 @@ class StepEstimator : IStepEstimator
             stepVector.RadialDisplacement(contact, averageNormalDisplacement);
             stepVector.AngleDisplacement(contact, 0);
             stepVector.RotationDisplacement(contact, 0);
-            stepVector.LambdaContactRotation(contact, 1);
+            stepVector.LambdaContactNormalForce(contact, 1);
+            stepVector.LambdaContactTangentialForce(contact, 1);
+            stepVector.LambdaContactTorque(contact, 1);
 
             foreach (var node in contact.FromNodes)
             {

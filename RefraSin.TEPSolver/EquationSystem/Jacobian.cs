@@ -147,7 +147,7 @@ public static class Jacobian
             -node.GibbsEnergyGradient.Tangential
         );
         yield return (
-            stepVector.StepVectorMap.LambdaContactRotation(node.Contact),
+            stepVector.StepVectorMap.LambdaContactTorque(node.Contact),
             node.TorqueLeverArm.Tangential
         );
     }
@@ -369,7 +369,7 @@ public static class Jacobian
                 -contactNode.ContactDirectionGradient.Normal
             );
             yield return (
-                stepVector.StepVectorMap.LambdaContactRotation(contactNode.Contact),
+                stepVector.StepVectorMap.LambdaContactTorque(contactNode.Contact),
                 contactNode.TorqueLeverArm.Normal
             );
         }
