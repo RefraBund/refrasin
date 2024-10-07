@@ -25,7 +25,7 @@ class StepEstimator : IStepEstimator
     private static void FillStepVector(StepVector stepVector, SolutionState currentState)
     {
         stepVector.LambdaDissipation(1);
-        
+
         foreach (var particle in currentState.Particles)
         {
             foreach (var node in particle.Nodes)
@@ -41,8 +41,9 @@ class StepEstimator : IStepEstimator
 
         foreach (var contact in currentState.ParticleContacts)
         {
-            var averageNormalDisplacement = contact.FromNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement) +
-                                            contact.ToNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement);
+            var averageNormalDisplacement =
+                contact.FromNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement)
+                + contact.ToNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement);
             stepVector.RadialDisplacement(contact, averageNormalDisplacement);
             stepVector.AngleDisplacement(contact, 0);
             stepVector.RotationDisplacement(contact, 0);
@@ -54,7 +55,7 @@ class StepEstimator : IStepEstimator
             {
                 stepVector.LambdaContactDistance(node, 0);
                 stepVector.LambdaContactDirection(node, 0);
-                
+
                 stepVector.LambdaVolume(node, 0);
                 stepVector.FluxToUpper(node, GuessFluxToUpper(node));
                 stepVector.NormalDisplacement(node, averageNormalDisplacement);
@@ -63,11 +64,11 @@ class StepEstimator : IStepEstimator
                 stepVector.FluxToUpper(node.ContactedNode, GuessFluxToUpper(node.ContactedNode));
                 stepVector.NormalDisplacement(node.ContactedNode, averageNormalDisplacement);
 
-                if (node is NeckNode)
-                {
-                    stepVector.TangentialDisplacement(node, GuessTangentialDisplacement(node));
-                    stepVector.TangentialDisplacement(node.ContactedNode, GuessTangentialDisplacement(node.ContactedNode));
-                }
+                stepVector.TangentialDisplacement(node, GuessTangentialDisplacement(node));
+                stepVector.TangentialDisplacement(
+                    node.ContactedNode,
+                    GuessTangentialDisplacement(node.ContactedNode)
+                );
             }
         }
     }
@@ -89,12 +90,16 @@ class StepEstimator : IStepEstimator
     }
 
     private static double GuessFluxToUpper(NodeBase node) =>
-        -node.InterfaceDiffusionCoefficient.ToUpper * (GuessVacancyConcentration(node) - GuessVacancyConcentration(node.Upper))
-      / Pow(node.SurfaceDistance.ToUpper, 2);
+        -node.InterfaceDiffusionCoefficient.ToUpper
+        * (GuessVacancyConcentration(node) - GuessVacancyConcentration(node.Upper))
+        / Pow(node.SurfaceDistance.ToUpper, 2);
 
     private static double GuessVacancyConcentration(NodeBase node) =>
-        (node is not NeckNode ? node.GibbsEnergyGradient.Normal : -Abs(node.GibbsEnergyGradient.Tangential))
-      / node.Particle.VacancyVolumeEnergy;
+        (
+            node is not NeckNode
+                ? node.GibbsEnergyGradient.Normal
+                : -Abs(node.GibbsEnergyGradient.Tangential)
+        ) / node.Particle.VacancyVolumeEnergy;
 
     /// <inheritdoc />
     public void RegisterWithSolver(SinteringSolver solver) { }

@@ -1,9 +1,5 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
-using Microsoft.VisualBasic.CompilerServices;
-using RefraSin.ParticleModel;
-using RefraSin.ParticleModel.Nodes;
-using RefraSin.ParticleModel.Particles;
 using RefraSin.TEPSolver.ParticleModel;
 
 namespace RefraSin.TEPSolver.StepVectors;
