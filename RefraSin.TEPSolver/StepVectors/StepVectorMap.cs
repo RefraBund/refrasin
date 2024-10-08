@@ -22,8 +22,16 @@ public class StepVectorMap
                     AddUnknown(node.Id, Unknown.NormalDisplacement);
                     AddUnknown(node.Id, Unknown.FluxToUpper);
                     AddUnknown(node.Id, Unknown.LambdaVolume);
+                    AddUnknown(node.Id, Unknown.NormalStress);
+                    AddUnknown(node.Id, Unknown.TangentialStress);
+                    AddUnknown(node.Id, Unknown.LambdaNormalStress);
+                    AddUnknown(node.Id, Unknown.LambdaTangentialStress);
                 }
             }
+
+            AddUnknown(particle.Id, Unknown.LambdaHorizontalForceBalance);
+            AddUnknown(particle.Id, Unknown.LambdaVerticalForceBalance);
+            AddUnknown(particle.Id, Unknown.LambdaTorqueBalance);
 
             _particleBlocks[particle.Id] = (startIndex, _index - startIndex);
         }
@@ -35,9 +43,6 @@ public class StepVectorMap
             AddUnknown(contact.MergedId, Unknown.RadialDisplacement);
             AddUnknown(contact.MergedId, Unknown.AngleDisplacement);
             AddUnknown(contact.MergedId, Unknown.RotationDisplacement);
-            AddUnknown(contact.MergedId, Unknown.LambdaContactNormalForce);
-            AddUnknown(contact.MergedId, Unknown.LambdaContactTangentialForce);
-            AddUnknown(contact.MergedId, Unknown.LambdaContactTorque);
 
             foreach (var contactNode in contact.FromNodes)
             {
@@ -107,10 +112,16 @@ public class StepVectorMap
 
     public int LambdaVolume(INode node) => _indices[(node.Id, Unknown.LambdaVolume)];
 
-    public int TangentialDisplacement(INode node) => _indices[(node.Id, Unknown.TangentialDisplacement)];
-    
+    public int LambdaNormalStress(INode node) => _indices[(node.Id, Unknown.LambdaNormalStress)];
+
+    public int LambdaTangentialStress(INode node) =>
+        _indices[(node.Id, Unknown.LambdaTangentialStress)];
+
+    public int TangentialDisplacement(INode node) =>
+        _indices[(node.Id, Unknown.TangentialDisplacement)];
+
     public int NormalStress(INode node) => _indices[(node.Id, Unknown.NormalStress)];
-    
+
     public int TangentialStress(INode node) => _indices[(node.Id, Unknown.TangentialStress)];
 
     public int LambdaContactDistance(INode node) =>
@@ -119,14 +130,14 @@ public class StepVectorMap
     public int LambdaContactDirection(INode node) =>
         _indices[(node.Id, Unknown.LambdaContactDirection)];
 
-    public int LambdaContactNormalForce(ParticleContact contact) =>
-        _indices[(contact.MergedId, Unknown.LambdaContactNormalForce)];
+    public int LambdaHorizontalForceBalance(Particle particle) =>
+        _indices[(particle.Id, Unknown.LambdaHorizontalForceBalance)];
 
-    public int LambdaContactTangentialForce(ParticleContact contact) =>
-        _indices[(contact.MergedId, Unknown.LambdaContactTangentialForce)];
+    public int LambdaVerticalForceBalance(Particle particle) =>
+        _indices[(particle.Id, Unknown.LambdaVerticalForceBalance)];
 
-    public int LambdaContactTorque(ParticleContact contact) =>
-        _indices[(contact.MergedId, Unknown.LambdaContactTorque)];
+    public int LambdaTorqueBalance(Particle particle) =>
+        _indices[(particle.Id, Unknown.LambdaTorqueBalance)];
 
     public int RadialDisplacement(ParticleContact contact) =>
         _indices[(contact.MergedId, Unknown.RadialDisplacement)];
@@ -147,9 +158,11 @@ public class StepVectorMap
         LambdaContactDirection,
         NormalStress,
         TangentialStress,
-        LambdaContactNormalForce,
-        LambdaContactTangentialForce,
-        LambdaContactTorque,
+        LambdaNormalStress,
+        LambdaTangentialStress,
+        LambdaHorizontalForceBalance,
+        LambdaVerticalForceBalance,
+        LambdaTorqueBalance,
         RadialDisplacement,
         AngleDisplacement,
         RotationDisplacement,

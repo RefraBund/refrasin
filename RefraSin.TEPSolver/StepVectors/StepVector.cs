@@ -29,6 +29,8 @@ public class StepVector : DenseVector
     public double FluxToUpper(INode node) => this[StepVectorMap.FluxToUpper(node)];
 
     public double LambdaVolume(INode node) => this[StepVectorMap.LambdaVolume(node)];
+    public double LambdaNormalStress(INode node) => this[StepVectorMap.LambdaNormalStress(node)];
+    public double LambdaTangentialStress(INode node) => this[StepVectorMap.LambdaTangentialStress(node)];
 
     public double TangentialDisplacement(INode node) =>
         this[StepVectorMap.TangentialDisplacement(node)];
@@ -44,14 +46,14 @@ public class StepVector : DenseVector
     public double LambdaContactDirection(INode node) =>
         this[StepVectorMap.LambdaContactDirection(node)];
 
-    public double LambdaContactNormalForce(ParticleContact contact) =>
-        this[StepVectorMap.LambdaContactNormalForce(contact)];
+    public double LambdaHorizontalForceBalance(Particle particle) =>
+        this[StepVectorMap.LambdaHorizontalForceBalance(particle)];
     
-    public double LambdaContactTangentialForce(ParticleContact contact) =>
-        this[StepVectorMap.LambdaContactTangentialForce(contact)];
+    public double LambdaVerticalForceBalance(Particle particle) =>
+        this[StepVectorMap.LambdaVerticalForceBalance(particle)];
     
-    public double LambdaContactTorque(ParticleContact contact) =>
-        this[StepVectorMap.LambdaContactTorque(contact)];
+    public double LambdaTorqueBalance(Particle particle) =>
+        this[StepVectorMap.LambdaTorqueBalance(particle)];
 
     public double RadialDisplacement(ParticleContact contact) =>
         this[StepVectorMap.RadialDisplacement(contact)];
@@ -69,6 +71,10 @@ public class StepVector : DenseVector
     public void FluxToUpper(INode node, double value) => this[StepVectorMap.FluxToUpper(node)] = value;
 
     public void LambdaVolume(INode node, double value) => this[StepVectorMap.LambdaVolume(node)] = value;
+    
+    public void LambdaNormalStress(INode node, double value) => this[StepVectorMap.LambdaNormalStress(node)] = value;
+    
+    public void LambdaTangentialStress(INode node, double value) => this[StepVectorMap.LambdaTangentialStress(node)] = value;
 
     public void TangentialDisplacement(INode node, double value) =>
         this[StepVectorMap.TangentialDisplacement(node)] = value;
@@ -79,14 +85,14 @@ public class StepVector : DenseVector
     public void LambdaContactDirection(INode node, double value) =>
         this[StepVectorMap.LambdaContactDirection(node)] = value;
 
-    public void LambdaContactNormalForce(ParticleContact contact, double value) =>
-        this[StepVectorMap.LambdaContactNormalForce(contact)] = value;
+    public void LambdaHorizontalForceBalance(Particle particle, double value) =>
+        this[StepVectorMap.LambdaHorizontalForceBalance(particle)] = value;
     
-    public void LambdaContactTangentialForce(ParticleContact contact, double value) =>
-        this[StepVectorMap.LambdaContactTangentialForce(contact)] = value;
+    public void LambdaVerticalForceBalance(Particle particle, double value) =>
+        this[StepVectorMap.LambdaVerticalForceBalance(particle)] = value;
     
-    public void LambdaContactTorque(ParticleContact contact, double value) =>
-        this[StepVectorMap.LambdaContactTorque(contact)] = value;
+    public void LambdaTorqueBalance(Particle particle, double value) =>
+        this[StepVectorMap.LambdaTorqueBalance(particle)] = value;
 
     public void RadialDisplacement(ParticleContact contact, double value) =>
         this[StepVectorMap.RadialDisplacement(contact)] = value;

@@ -1,4 +1,5 @@
 using MathNet.Numerics.LinearAlgebra;
+using RefraSin.Coordinates;
 using RefraSin.TEPSolver.ParticleModel;
 using RefraSin.TEPSolver.StepVectors;
 using static RefraSin.TEPSolver.EquationSystem.Helper;
@@ -66,7 +67,8 @@ public static class Jacobian
     public static JacobianRows YieldLinearBorderBlockRows(
         SolutionState currentState,
         StepVector stepVector
-    ) => YieldContactsEquations(currentState.ParticleContacts, stepVector);
+    ) =>
+            YieldContactsEquations(currentState.ParticleContacts, stepVector);
 
     public static JacobianRows YieldBorderBlockRows(
         SolutionState currentState,
@@ -82,11 +84,6 @@ public static class Jacobian
         contacts.SelectMany(contact =>
             Join(
                 YieldContactAuxiliaryDerivatives(stepVector, contact),
-                [
-                    ContactNormalForceConstraint(stepVector, contact),
-                    ContactTangentialForceConstraint(stepVector, contact),
-                    ContactTorqueConstraint(stepVector, contact)
-                ],
                 YieldContactNodesEquations(stepVector, contact)
             )
         );
@@ -144,18 +141,25 @@ public static class Jacobian
         );
         yield return (
             stepVector.StepVectorMap.LambdaDissipation(),
-            -node.GibbsEnergyGradient.Tangential
+            -(
+                node.GibbsEnergyGradient.Tangential
+                + 0.5 * node.SurfaceDistance.Sum * stepVector.TangentialStress(node)
+            )
         );
         yield return (
-            stepVector.StepVectorMap.LambdaContactNormalForce(node.Contact),
+            stepVector.StepVectorMap.TangentialStress(node),
+            -0.5 * node.SurfaceDistance.Sum * stepVector.LambdaDissipation()
+        );
+        yield return (
+            stepVector.StepVectorMap.LambdaHorizontalForceBalance(node.Contact),
             Cos(node.CenterShiftVectorDirection.Tangential) * (node.IsParentsNode ? 1 : -1)
         );
         yield return (
-            stepVector.StepVectorMap.LambdaContactTangentialForce(node.Contact),
+            stepVector.StepVectorMap.LambdaVerticalForceBalance(node.Contact),
             Sin(node.CenterShiftVectorDirection.Tangential) * (node.IsParentsNode ? 1 : -1)
         );
         yield return (
-            stepVector.StepVectorMap.LambdaContactTorque(node.Contact),
+            stepVector.StepVectorMap.LambdaTorqueBalance(node.Contact),
             node.TorqueLeverArm.Tangential
         );
     }
@@ -248,80 +252,50 @@ public static class Jacobian
         );
     }
 
-    public static JacobianRow ContactNormalForceConstraint(
+    public static JacobianRow ParticleHorizontalForceBalance(
         StepVector stepVector,
-        ParticleContact contact
+        Particle particle
     )
     {
-        foreach (var node in contact.FromNodes)
+        foreach (var n in particle.Nodes)
         {
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node),
-                Cos(node.CenterShiftVectorDirection.Normal)
+                stepVector.StepVectorMap.NormalStress(n),
+                Cos(n.Coordinates.Phi + (Angle.Half - n.RadiusNormalAngle.ToUpper))
             );
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node.ContactedNode),
-                -Cos(node.ContactedNode.CenterShiftVectorDirection.Normal)
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node),
-                Cos(node.CenterShiftVectorDirection.Tangential)
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node.ContactedNode),
-                -Cos(node.ContactedNode.CenterShiftVectorDirection.Tangential)
+                stepVector.StepVectorMap.TangentialStress(n),
+                Cos(n.Coordinates.Phi + (Angle.Half - n.RadiusTangentAngle.ToUpper))
             );
         }
     }
 
-    public static JacobianRow ContactTangentialForceConstraint(
-        StepVector stepVector,
-        ParticleContact contact
-    )
+    public static JacobianRow ParticleVerticalForceBalance(StepVector stepVector, Particle particle)
     {
-        foreach (var node in contact.FromNodes)
+        foreach (var n in particle.Nodes)
         {
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node),
-                Sin(node.CenterShiftVectorDirection.Normal)
+                stepVector.StepVectorMap.NormalStress(n),
+                Sin(n.Coordinates.Phi + (Angle.Half - n.RadiusNormalAngle.ToUpper))
             );
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node.ContactedNode),
-                -Sin(node.ContactedNode.CenterShiftVectorDirection.Normal)
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node),
-                Sin(node.CenterShiftVectorDirection.Tangential)
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node.ContactedNode),
-                -Sin(node.ContactedNode.CenterShiftVectorDirection.Tangential)
+                stepVector.StepVectorMap.TangentialStress(n),
+                Sin(n.Coordinates.Phi + (Angle.Half - n.RadiusTangentAngle.ToUpper))
             );
         }
     }
 
-    public static JacobianRow ContactTorqueConstraint(
-        StepVector stepVector,
-        ParticleContact contact
-    )
+    public static JacobianRow ParticleTorqueBalance(StepVector stepVector, Particle particle)
     {
-        foreach (var node in contact.FromNodes)
+        foreach (var n in particle.Nodes)
         {
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node),
-                node.TorqueLeverArm.Normal
+                stepVector.StepVectorMap.NormalStress(n),
+                Sin(n.RadiusNormalAngle.ToUpper) * n.Coordinates.R
             );
             yield return (
-                stepVector.StepVectorMap.NormalDisplacement(node.ContactedNode),
-                node.ContactedNode.TorqueLeverArm.Normal
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node),
-                node.TorqueLeverArm.Tangential
-            );
-            yield return (
-                stepVector.StepVectorMap.TangentialDisplacement(node.ContactedNode),
-                node.ContactedNode.TorqueLeverArm.Tangential
+                stepVector.StepVectorMap.TangentialStress(n),
+                Sin(n.RadiusTangentAngle.ToUpper) * n.Coordinates.R
             );
         }
     }
@@ -379,7 +353,16 @@ public static class Jacobian
     public static JacobianRows YieldParticleBlockEquations(
         Particle particle,
         StepVector stepVector
-    ) => Join(YieldNodeEquations(particle.Nodes, stepVector));
+    ) => 
+        Join(
+            YieldNodeEquations(particle.Nodes, stepVector),
+            [
+                ParticleHorizontalForceBalance(stepVector, particle),
+                ParticleVerticalForceBalance(stepVector, particle),
+                ParticleTorqueBalance(stepVector, particle)
+            ]
+        );
+
 
     public static JacobianRows YieldNodeEquations(
         IEnumerable<NodeBase> nodes,
@@ -402,7 +385,14 @@ public static class Jacobian
         yield return (stepVector.StepVectorMap.LambdaVolume(node), node.VolumeGradient.Normal);
         yield return (
             stepVector.StepVectorMap.LambdaDissipation(),
-            -node.GibbsEnergyGradient.Normal
+            -(
+                node.GibbsEnergyGradient.Normal
+                + 0.5 * node.SurfaceDistance.Sum * stepVector.NormalStress(node)
+            )
+        );
+        yield return (
+            stepVector.StepVectorMap.NormalStress(node),
+            -0.5 * node.SurfaceDistance.Sum * stepVector.LambdaDissipation()
         );
 
         if (node is ContactNodeBase contactNode)
@@ -416,17 +406,17 @@ public static class Jacobian
                 -contactNode.ContactDirectionGradient.Normal
             );
             yield return (
-                stepVector.StepVectorMap.LambdaContactNormalForce(contactNode.Contact),
+                stepVector.StepVectorMap.LambdaHorizontalForceBalance(contactNode.Contact),
                 Cos(contactNode.CenterShiftVectorDirection.Normal)
                     * (contactNode.IsParentsNode ? 1 : -1)
             );
             yield return (
-                stepVector.StepVectorMap.LambdaContactTangentialForce(contactNode.Contact),
+                stepVector.StepVectorMap.LambdaVerticalForceBalance(contactNode.Contact),
                 Sin(contactNode.CenterShiftVectorDirection.Normal)
                     * (contactNode.IsParentsNode ? 1 : -1)
             );
             yield return (
-                stepVector.StepVectorMap.LambdaContactTorque(contactNode.Contact),
+                stepVector.StepVectorMap.LambdaTorqueBalance(contactNode.Contact),
                 contactNode.TorqueLeverArm.Normal
             );
         }
