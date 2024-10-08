@@ -238,8 +238,10 @@ public static class Lagrangian
         var verticalTerm =
             Sin(node.Coordinates.Phi + (Angle.Half - node.RadiusNormalAngle.ToUpper))
             * stepVector.LambdaVerticalForceBalance(node.Particle);
+        var torqueTerm =
+            stepVector.LambdaTorqueBalance(node.Particle) * Sin(node.RadiusNormalAngle.ToUpper) * node.Coordinates.R;
 
-        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm;
+        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm + torqueTerm;
     }
 
     public static double TangentialStressDerivative(StepVector stepVector, NodeBase node)
@@ -257,8 +259,10 @@ public static class Lagrangian
         var verticalTerm =
             Sin(node.Coordinates.Phi + (Angle.Half - node.RadiusTangentAngle.ToUpper))
             * stepVector.LambdaVerticalForceBalance(node.Particle);
+        var torqueTerm =
+            stepVector.LambdaTorqueBalance(node.Particle) * Sin(node.RadiusTangentAngle.ToUpper) * node.Coordinates.R;
 
-        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm;
+        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm + torqueTerm;
     }
 
     public static double SurfaceNodeNormalStressConstraint(StepVector stepVector, NodeBase node) =>
