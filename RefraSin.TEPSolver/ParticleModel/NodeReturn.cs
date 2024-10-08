@@ -48,7 +48,7 @@ internal record NodeReturn : IParticleNode, INodeGradients, INodeShifts, INodeFl
         Shift = stepVector is not null
             ? new NormalTangential<double>(
                 stepVector.NormalDisplacement(template),
-                stepVector.TangentialDisplacement(template)
+                template.Type == NodeType.Surface ? 0 : stepVector.TangentialDisplacement(template)
             )
                 * norm.Length
                 / norm.Time

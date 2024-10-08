@@ -31,7 +31,7 @@ public class StepVector : DenseVector
     public double LambdaVolume(INode node) => this[StepVectorMap.LambdaVolume(node)];
 
     public double TangentialDisplacement(INode node) =>
-        node.Type == NodeType.Neck ? this[StepVectorMap.TangentialDisplacement(node)] : 0;
+        this[StepVectorMap.TangentialDisplacement(node)];
 
     public double LambdaContactDistance(INode node) =>
         this[StepVectorMap.LambdaContactDistance(node)];

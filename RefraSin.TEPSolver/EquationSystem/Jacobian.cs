@@ -261,7 +261,7 @@ public static class Jacobian
             );
             yield return (
                 stepVector.StepVectorMap.NormalDisplacement(node.ContactedNode),
-                -Cos(node.CenterShiftVectorDirection.Normal)
+                -Cos(node.ContactedNode.CenterShiftVectorDirection.Normal)
             );
             yield return (
                 stepVector.StepVectorMap.TangentialDisplacement(node),
@@ -269,7 +269,7 @@ public static class Jacobian
             );
             yield return (
                 stepVector.StepVectorMap.TangentialDisplacement(node.ContactedNode),
-                -Cos(node.CenterShiftVectorDirection.Tangential)
+                -Cos(node.ContactedNode.CenterShiftVectorDirection.Tangential)
             );
         }
     }
@@ -287,7 +287,7 @@ public static class Jacobian
             );
             yield return (
                 stepVector.StepVectorMap.NormalDisplacement(node.ContactedNode),
-                -Sin(node.CenterShiftVectorDirection.Normal)
+                -Sin(node.ContactedNode.CenterShiftVectorDirection.Normal)
             );
             yield return (
                 stepVector.StepVectorMap.TangentialDisplacement(node),
@@ -295,7 +295,7 @@ public static class Jacobian
             );
             yield return (
                 stepVector.StepVectorMap.TangentialDisplacement(node.ContactedNode),
-                -Sin(node.CenterShiftVectorDirection.Tangential)
+                -Sin(node.ContactedNode.CenterShiftVectorDirection.Tangential)
             );
         }
     }

@@ -64,11 +64,14 @@ class StepEstimator : IStepEstimator
                 stepVector.FluxToUpper(node.ContactedNode, GuessFluxToUpper(node.ContactedNode));
                 stepVector.NormalDisplacement(node.ContactedNode, averageNormalDisplacement);
 
-                stepVector.TangentialDisplacement(node, GuessTangentialDisplacement(node));
-                stepVector.TangentialDisplacement(
-                    node.ContactedNode,
-                    GuessTangentialDisplacement(node.ContactedNode)
-                );
+                if (node.Type == NodeType.Neck)
+                {
+                    stepVector.TangentialDisplacement(node, GuessTangentialDisplacement(node));
+                    stepVector.TangentialDisplacement(
+                        node.ContactedNode,
+                        GuessTangentialDisplacement(node.ContactedNode)
+                    );
+                }
             }
         }
     }
