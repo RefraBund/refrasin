@@ -1,14 +1,8 @@
-using RefraSin.ParticleModel;
-using RefraSin.ParticleModel.Nodes;
-using RefraSin.ProcessModel;
 using RefraSin.ProcessModel.Sintering;
 using RefraSin.TEPSolver.ParticleModel;
 using RefraSin.TEPSolver.StepVectors;
-using static System.Math;
-using static RefraSin.TEPSolver.EquationSystem.Helper;
 using GrainBoundaryNode = RefraSin.TEPSolver.ParticleModel.GrainBoundaryNode;
 using NeckNode = RefraSin.TEPSolver.ParticleModel.NeckNode;
-using Particle = RefraSin.TEPSolver.ParticleModel.Particle;
 
 namespace RefraSin.TEPSolver.StepEstimators;
 
@@ -47,9 +41,6 @@ class StepEstimator : IStepEstimator
             stepVector.RadialDisplacement(contact, averageNormalDisplacement);
             stepVector.AngleDisplacement(contact, 0);
             stepVector.RotationDisplacement(contact, 0);
-            stepVector.LambdaContactNormalForce(contact, 1);
-            stepVector.LambdaContactTangentialForce(contact, 1);
-            stepVector.LambdaContactTorque(contact, 1);
 
             foreach (var node in contact.FromNodes)
             {

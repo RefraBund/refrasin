@@ -6,17 +6,14 @@ namespace RefraSin.TEPSolver.EquationSystem;
 
 public class EquationSystem
 {
-    private readonly SolutionState _solutionState;
-    private readonly StepVector _stepVector;
-
     private readonly IReadOnlyDictionary<Guid, IEquation[]> _particleBlocks;
     private readonly IReadOnlyDictionary<(Guid, Guid), IEquation[]> _contactBlocks;
     private readonly IReadOnlyList<IEquation> _globalBlock;
 
     public EquationSystem(SolutionState solutionState, StepVector stepVector)
     {
-        _solutionState = solutionState;
-        _stepVector = stepVector;
+        State = solutionState;
+        StepVector = stepVector;
 
         _particleBlocks = solutionState.Particles.ToDictionary(
             p => p.Id,
@@ -29,48 +26,52 @@ public class EquationSystem
         _globalBlock = YieldGlobalEquations().ToArray();
     }
 
+    public SolutionState State { get; }
+
+    public StepVector StepVector { get; }
+
     private IEnumerable<IEquation> YieldParticleEquations(Particle p)
     {
         foreach (var n in p.Nodes)
         {
-            yield return new NormalDisplacementDerivative(n, _stepVector);
+            yield return new NormalDisplacementDerivative(n, StepVector);
             if (n is ContactNodeBase cn)
-                yield return new TangentialDisplacementDerivative(cn, _stepVector);
-            yield return new FluxDerivative(n, _stepVector);
-            yield return new VolumeBalanceConstraint(n, _stepVector);
-            yield return new NormalStressDerivative(n, _stepVector);
-            yield return new TangentialStressDerivative(n, _stepVector);
+                yield return new TangentialDisplacementDerivative(cn, StepVector);
+            yield return new FluxDerivative(n, StepVector);
+            yield return new VolumeBalanceConstraint(n, StepVector);
+            yield return new NormalStressDerivative(n, StepVector);
+            yield return new TangentialStressDerivative(n, StepVector);
 
             if (n is SurfaceNode sn)
             {
-                yield return new NormalStressConstraintSurface(sn, _stepVector);
-                yield return new TangentialStressConstraintSurface(sn, _stepVector);
+                yield return new NormalStressConstraintSurface(sn, StepVector);
+                yield return new TangentialStressConstraintSurface(sn, StepVector);
             }
         }
 
-        yield return new ParticleHorizontalForceBalanceConstraint(p, _stepVector);
-        yield return new ParticleVerticalForceBalanceConstraint(p, _stepVector);
-        yield return new ParticleTorqueBalanceConstraint(p, _stepVector);
+        yield return new ParticleHorizontalForceBalanceConstraint(p, StepVector);
+        yield return new ParticleVerticalForceBalanceConstraint(p, StepVector);
+        yield return new ParticleTorqueBalanceConstraint(p, StepVector);
     }
 
     private IEnumerable<IEquation> YieldContactEquations(ParticleContact contact)
     {
         foreach (var n in contact.FromNodes)
         {
-            yield return new ContactDistanceConstraint(n, _stepVector);
-            yield return new ContactDirectionConstraint(n, _stepVector);
+            yield return new ContactDistanceConstraint(n, StepVector);
+            yield return new ContactDirectionConstraint(n, StepVector);
 
-            yield return new NormalStressConstraintContact(n, _stepVector);
-            yield return new TangentialStressConstraintContact(n, _stepVector);
+            yield return new NormalStressConstraintContact(n, StepVector);
+            yield return new TangentialStressConstraintContact(n, StepVector);
         }
 
-        yield return new ContactDistanceDerivative(contact, _stepVector);
-        yield return new ContactDirectionDerivative(contact, _stepVector);
+        yield return new ContactDistanceDerivative(contact, StepVector);
+        yield return new ContactDirectionDerivative(contact, StepVector);
     }
 
     private IEnumerable<IEquation> YieldGlobalEquations()
     {
-        yield return new DissipationEqualityConstraint(_solutionState, _stepVector);
+        yield return new DissipationEqualityConstraint(State, StepVector);
     }
 
     public IReadOnlyList<IEquation> Equations =>
@@ -93,8 +94,8 @@ public class EquationSystem
 
     public Matrix<double> Jacobian() =>
         Matrix<double>.Build.SparseOfIndexed(
-            _stepVector.Count,
-            _stepVector.Count,
+            StepVector.Count,
+            StepVector.Count,
             Equations.SelectMany((e, i) => e.Derivative().Select(c => (i, c.Item1, c.Item2)))
         );
 

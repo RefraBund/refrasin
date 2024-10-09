@@ -36,10 +36,10 @@ public class StepVectorMap
             _particleBlocks[particle.Id] = (startIndex, _index - startIndex);
         }
 
-        BorderStart = _index;
-
         foreach (var contact in currentState.ParticleContacts)
         {
+            var startIndex = _index;
+
             AddUnknown(contact.MergedId, Unknown.RadialDisplacement);
             AddUnknown(contact.MergedId, Unknown.AngleDisplacement);
             AddUnknown(contact.MergedId, Unknown.RotationDisplacement);
@@ -85,11 +85,15 @@ public class StepVectorMap
                     Unknown.LambdaTangentialStress
                 );
             }
+
+            _contactBlocks[(contact.From.Id, contact.To.Id)] = (startIndex, _index - startIndex);
         }
+
+        GlobalStart = _index;
 
         AddUnknown(Guid.Empty, Unknown.LambdaDissipation);
 
-        BorderLength = _index - BorderStart;
+        GlobalLength = _index - GlobalStart;
         TotalLength = _index;
     }
 
@@ -109,12 +113,16 @@ public class StepVectorMap
     private int _index;
     private readonly Dictionary<(Guid, Unknown), int> _indices = new();
     private readonly Dictionary<Guid, (int start, int length)> _particleBlocks = new();
+    private readonly Dictionary<(Guid, Guid), (int start, int length)> _contactBlocks = new();
 
     public (int start, int length) this[IParticle particle] => _particleBlocks[particle.Id];
 
-    public int BorderStart { get; }
+    public (int start, int length) this[IParticleContactEdge contact] =>
+        _contactBlocks[(contact.From, contact.To)];
 
-    public int BorderLength { get; }
+    public int GlobalStart { get; }
+
+    public int GlobalLength { get; }
 
     public int LambdaDissipation() => _indices[(Guid.Empty, Unknown.LambdaDissipation)];
 
