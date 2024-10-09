@@ -26,5 +26,21 @@ public class TangentialDisplacementDerivative : NodeEquationBase<ContactNodeBase
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (
+            Map.LambdaDissipation(),
+            -(
+                Node.GibbsEnergyGradient.Tangential
+                + 0.5 * Node.SurfaceDistance.Sum * Step.TangentialStress(Node)
+            )
+        );
+        yield return (
+            Map.TangentialStress(Node),
+            -0.5 * Node.SurfaceDistance.Sum * Step.LambdaDissipation()
+        );
+        yield return (Map.LambdaVolume(Node), Node.VolumeGradient.Tangential);
+        yield return (Map.LambdaContactDistance(Node), -Node.ContactDistanceGradient.Tangential);
+        yield return (Map.LambdaContactDirection(Node), -Node.ContactDirectionGradient.Tangential);
+    }
 }

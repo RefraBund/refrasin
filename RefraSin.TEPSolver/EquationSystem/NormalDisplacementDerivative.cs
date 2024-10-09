@@ -34,5 +34,31 @@ public class NormalDisplacementDerivative : NodeEquationBase<NodeBase>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (
+            Map.LambdaDissipation(),
+            -(
+                Node.GibbsEnergyGradient.Normal
+                + 0.5 * Node.SurfaceDistance.Sum * Step.NormalStress(Node)
+            )
+        );
+        yield return (
+            Map.NormalStress(Node),
+            -0.5 * Node.SurfaceDistance.Sum * Step.LambdaDissipation()
+        );
+        yield return (Map.LambdaVolume(Node), Node.VolumeGradient.Normal);
+
+        if (Node is ContactNodeBase contactNode)
+        {
+            yield return (
+                Map.LambdaContactDistance(contactNode),
+                -contactNode.ContactDistanceGradient.Normal
+            );
+            yield return (
+                Map.LambdaContactDirection(contactNode),
+                -contactNode.ContactDirectionGradient.Normal
+            );
+        }
+    }
 }

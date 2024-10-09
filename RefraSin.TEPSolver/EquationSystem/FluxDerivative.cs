@@ -26,5 +26,17 @@ public class FluxDerivative : NodeEquationBase<NodeBase>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        var bilinearPreFactor =
+            -2
+            * Node.Particle.VacancyVolumeEnergy
+            * Node.SurfaceDistance.ToUpper
+            / Node.InterfaceDiffusionCoefficient.ToUpper;
+
+        yield return (Map.FluxToUpper(Node), bilinearPreFactor * Step.LambdaDissipation());
+        yield return (Map.LambdaDissipation(), bilinearPreFactor * Step.FluxToUpper(Node));
+        yield return (Map.LambdaVolume(Node), -1);
+        yield return (Map.LambdaVolume(Node.Upper), 1);
+    }
 }

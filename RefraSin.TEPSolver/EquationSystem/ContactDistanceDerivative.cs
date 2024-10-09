@@ -13,5 +13,6 @@ public class ContactDistanceDerivative : ContactEquationBase
     public override double Value() => Contact.FromNodes.Sum(Step.LambdaContactDistance);
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative() =>
+        Contact.FromNodes.Select(node => (Map.LambdaContactDirection(node), 1.0));
 }

@@ -42,5 +42,25 @@ public class DissipationEqualityConstraint : GlobalEquationBase
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        foreach (var node in State.Nodes)
+        {
+            yield return (Map.NormalDisplacement(node), -node.GibbsEnergyGradient.Normal);
+            yield return (
+                Map.FluxToUpper(node),
+                -2
+                    * node.Particle.VacancyVolumeEnergy
+                    * node.SurfaceDistance.ToUpper
+                    / node.InterfaceDiffusionCoefficient.ToUpper
+                    * Step.FluxToUpper(node)
+            );
+
+            if (node is ContactNodeBase contactNode)
+                yield return (
+                    Map.TangentialDisplacement(contactNode),
+                    -node.GibbsEnergyGradient.Tangential
+                );
+        }
+    }
 }

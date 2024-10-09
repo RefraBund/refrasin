@@ -22,5 +22,21 @@ public class ParticleRotationDerivative : ContactEquationBase
         );
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        foreach (var node in Contact.FromNodes)
+        {
+            yield return (
+                Map.LambdaContactDistance(node),
+                node.ContactedNode.Coordinates.R
+                    * Sin(node.ContactedNode.AngleDistanceToContactDirection)
+            );
+            yield return (
+                Map.LambdaContactDirection(node),
+                -node.ContactedNode.Coordinates.R
+                    / Contact.Distance
+                    * Cos(node.ContactedNode.AngleDistanceToContactDirection)
+            );
+        }
+    }
 }

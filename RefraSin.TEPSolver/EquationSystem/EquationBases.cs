@@ -3,16 +3,11 @@ using RefraSin.TEPSolver.StepVectors;
 
 namespace RefraSin.TEPSolver.EquationSystem;
 
-public abstract class GlobalEquationBase : IEquation
+public abstract class EquationBase(StepVector step) : IEquation
 {
-    protected readonly SolutionState State;
-    protected readonly StepVector Step;
+    protected readonly StepVector Step = step;
 
-    public GlobalEquationBase(SolutionState state, StepVector step)
-    {
-        State = state;
-        Step = step;
-    }
+    public StepVectorMap Map => Step.StepVectorMap;
 
     /// <inheritdoc />
     public abstract double Value();
@@ -21,57 +16,24 @@ public abstract class GlobalEquationBase : IEquation
     public abstract IEnumerable<(int, double)> Derivative();
 }
 
-public abstract class ParticleEquationBase : IEquation
+public abstract class GlobalEquationBase(SolutionState state, StepVector step) : EquationBase(step)
 {
-    protected readonly Particle Particle;
-    protected readonly StepVector Step;
-
-    public ParticleEquationBase(Particle particle, StepVector step)
-    {
-        Particle = particle;
-        Step = step;
-    }
-
-    /// <inheritdoc />
-    public abstract double Value();
-
-    /// <inheritdoc />
-    public abstract IEnumerable<(int, double)> Derivative();
+    protected readonly SolutionState State = state;
 }
 
-public abstract class ContactEquationBase : IEquation
+public abstract class ParticleEquationBase(Particle particle, StepVector step) : EquationBase(step)
 {
-    protected readonly ParticleContact Contact;
-    protected readonly StepVector Step;
-
-    public ContactEquationBase(ParticleContact contact, StepVector step)
-    {
-        Contact = contact;
-        Step = step;
-    }
-
-    /// <inheritdoc />
-    public abstract double Value();
-
-    /// <inheritdoc />
-    public abstract IEnumerable<(int, double)> Derivative();
+    protected readonly Particle Particle = particle;
 }
 
-public abstract class NodeEquationBase<TNode> : IEquation
+public abstract class ContactEquationBase(ParticleContact contact, StepVector step)
+    : EquationBase(step)
+{
+    protected readonly ParticleContact Contact = contact;
+}
+
+public abstract class NodeEquationBase<TNode>(TNode node, StepVector step) : EquationBase(step)
     where TNode : INode
 {
-    protected readonly TNode Node;
-    protected readonly StepVector Step;
-
-    public NodeEquationBase(TNode node, StepVector step)
-    {
-        Node = node;
-        Step = step;
-    }
-
-    /// <inheritdoc />
-    public abstract double Value();
-
-    /// <inheritdoc />
-    public abstract IEnumerable<(int, double)> Derivative();
+    protected readonly TNode Node = node;
 }

@@ -24,5 +24,24 @@ public class ContactDirectionConstraint : NodeEquationBase<ContactNodeBase>
             * Step.RotationDisplacement(Node.Contact);
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (Map.AngleDisplacement(Node.Contact), 1.0);
+        yield return (
+            Map.RotationDisplacement(Node.Contact),
+            -Node.ContactedNode.Coordinates.R
+                / Node.Contact.Distance
+                * Cos(Node.ContactedNode.AngleDistanceToContactDirection)
+        );
+        yield return (Map.NormalDisplacement(Node), -Node.ContactDirectionGradient.Normal);
+        yield return (
+            Map.NormalDisplacement(Node.ContactedNode),
+            -Node.ContactedNode.ContactDirectionGradient.Normal
+        );
+        yield return (Map.TangentialDisplacement(Node), -Node.ContactDirectionGradient.Tangential);
+        yield return (
+            Map.TangentialDisplacement(Node.ContactedNode),
+            -Node.ContactedNode.ContactDirectionGradient.Tangential
+        );
+    }
 }

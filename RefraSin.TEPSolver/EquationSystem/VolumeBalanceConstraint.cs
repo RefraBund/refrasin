@@ -27,5 +27,15 @@ public class VolumeBalanceConstraint : NodeEquationBase<NodeBase>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (Map.NormalDisplacement(Node), Node.VolumeGradient.Normal);
+        yield return (Map.FluxToUpper(Node), -1);
+        yield return (Map.FluxToUpper(Node.Lower), 1);
+
+        if (Node is ContactNodeBase contactNode)
+        {
+            yield return (Map.TangentialDisplacement(contactNode), Node.VolumeGradient.Tangential);
+        }
+    }
 }
