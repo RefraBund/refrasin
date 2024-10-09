@@ -65,13 +65,25 @@ public class StepVectorMap
                 AddUnknown(contactNode.Id, Unknown.LambdaVolume);
                 AddUnknown(contactNode.Id, Unknown.NormalStress);
                 AddUnknown(contactNode.Id, Unknown.TangentialStress);
+                AddUnknown(contactNode.Id, Unknown.LambdaNormalStress);
+                AddUnknown(contactNode.Id, Unknown.LambdaTangentialStress);
 
                 AddUnknown(contactNode.ContactedNodeId, Unknown.NormalDisplacement);
                 AddUnknown(contactNode.ContactedNodeId, Unknown.TangentialDisplacement);
                 AddUnknown(contactNode.ContactedNodeId, Unknown.FluxToUpper);
                 AddUnknown(contactNode.ContactedNodeId, Unknown.LambdaVolume);
-                LinkUnknown(contactNode.Id, contactNode.ContactedNodeId, Unknown.NormalStress);
-                LinkUnknown(contactNode.Id, contactNode.ContactedNodeId, Unknown.TangentialStress);
+                AddUnknown(contactNode.ContactedNodeId, Unknown.NormalStress);
+                AddUnknown(contactNode.ContactedNodeId, Unknown.TangentialStress);
+                LinkUnknown(
+                    contactNode.Id,
+                    contactNode.ContactedNodeId,
+                    Unknown.LambdaNormalStress
+                );
+                LinkUnknown(
+                    contactNode.Id,
+                    contactNode.ContactedNodeId,
+                    Unknown.LambdaTangentialStress
+                );
             }
         }
 

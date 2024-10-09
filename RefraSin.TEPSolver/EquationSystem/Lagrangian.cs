@@ -106,6 +106,8 @@ public static class Lagrangian
             yield return RequiredConstraint(stepVector, contactNode);
             yield return NormalStressDerivative(stepVector, contactNode);
             yield return TangentialStressDerivative(stepVector, contactNode);
+            yield return ContactNodeNormalStressConstraint(stepVector, contactNode);
+            yield return ContactNodeTangentialStressConstraint(stepVector, contactNode);
 
             yield return StateVelocityDerivativeNormal(stepVector, contactNode.ContactedNode);
             yield return StateVelocityDerivativeTangential(stepVector, contactNode.ContactedNode);
@@ -239,9 +241,19 @@ public static class Lagrangian
             Sin(node.Coordinates.Phi + (Angle.Half - node.RadiusNormalAngle.ToUpper))
             * stepVector.LambdaVerticalForceBalance(node.Particle);
         var torqueTerm =
-            stepVector.LambdaTorqueBalance(node.Particle) * Sin(node.RadiusNormalAngle.ToUpper) * node.Coordinates.R;
+            stepVector.LambdaTorqueBalance(node.Particle)
+            * Sin(node.RadiusNormalAngle.ToUpper)
+            * node.Coordinates.R;
+        var contactTerm = node is ContactNodeBase contactNode
+            ? stepVector.LambdaNormalStress(contactNode) * (contactNode.IsParentsNode ? 1 : -1)
+            : 0;
 
-        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm + torqueTerm;
+        return -gibbsTerm
+            + constraintsTerm
+            + horizontalTerm
+            + verticalTerm
+            + torqueTerm
+            + contactTerm;
     }
 
     public static double TangentialStressDerivative(StepVector stepVector, NodeBase node)
@@ -260,9 +272,19 @@ public static class Lagrangian
             Sin(node.Coordinates.Phi + (Angle.Half - node.RadiusTangentAngle.ToUpper))
             * stepVector.LambdaVerticalForceBalance(node.Particle);
         var torqueTerm =
-            stepVector.LambdaTorqueBalance(node.Particle) * Sin(node.RadiusTangentAngle.ToUpper) * node.Coordinates.R;
+            stepVector.LambdaTorqueBalance(node.Particle)
+            * Sin(node.RadiusTangentAngle.ToUpper)
+            * node.Coordinates.R;
+        var contactTerm = node is ContactNodeBase contactNode
+            ? stepVector.LambdaTangentialStress(contactNode) * (contactNode.IsParentsNode ? 1 : -1)
+            : 0;
 
-        return -gibbsTerm + constraintsTerm + horizontalTerm + verticalTerm + torqueTerm;
+        return -gibbsTerm
+            + constraintsTerm
+            + horizontalTerm
+            + verticalTerm
+            + torqueTerm
+            + contactTerm;
     }
 
     public static double SurfaceNodeNormalStressConstraint(StepVector stepVector, NodeBase node) =>
@@ -338,6 +360,16 @@ public static class Lagrangian
             / contact.Distance
             * Cos(node.ContactedNode.AngleDistanceToContactDirection)
             * stepVector.RotationDisplacement(contact);
+
+    public static double ContactNodeNormalStressConstraint(
+        StepVector stepVector,
+        ContactNodeBase node
+    ) => stepVector.NormalStress(node) - stepVector.NormalStress(node.ContactedNode);
+
+    public static double ContactNodeTangentialStressConstraint(
+        StepVector stepVector,
+        ContactNodeBase node
+    ) => stepVector.TangentialStress(node) - stepVector.TangentialStress(node.ContactedNode);
 
     public static double ParticleHorizontalForceBalance(StepVector stepVector, Particle particle) =>
         particle
