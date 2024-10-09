@@ -58,6 +58,7 @@ public abstract class ContactEquationBase : IEquation
 }
 
 public abstract class NodeEquationBase<TNode> : IEquation
+    where TNode : INode
 {
     protected readonly TNode Node;
     protected readonly StepVector Step;
