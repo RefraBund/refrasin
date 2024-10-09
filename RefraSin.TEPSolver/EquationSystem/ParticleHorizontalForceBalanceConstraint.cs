@@ -22,5 +22,18 @@ public class ParticleHorizontalForceBalanceConstraint : ParticleEquationBase
             .Sum();
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        foreach (var n in Particle.Nodes)
+        {
+            yield return (
+                Map.NormalStress(n),
+                Cos(n.Coordinates.Phi + (Angle.Half - n.RadiusNormalAngle.ToUpper))
+            );
+            yield return (
+                Map.TangentialStress(n),
+                Cos(n.Coordinates.Phi + (Angle.Half - n.RadiusTangentAngle.ToUpper))
+            );
+        }
+    }
 }

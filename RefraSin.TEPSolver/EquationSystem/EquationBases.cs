@@ -33,7 +33,8 @@ public abstract class ContactEquationBase(ParticleContact contact, StepVector st
 }
 
 public abstract class NodeEquationBase<TNode>(TNode node, StepVector step) : EquationBase(step)
-    where TNode : INode
+    where TNode : NodeBase
 {
     protected readonly TNode Node = node;
+    protected Particle Particle => Node.Particle;
 }

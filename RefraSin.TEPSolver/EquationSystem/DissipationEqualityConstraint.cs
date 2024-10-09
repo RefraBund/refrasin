@@ -20,8 +20,7 @@ public class DissipationEqualityConstraint : GlobalEquationBase
             .Sum();
 
         var dissipationTangential = State
-            .Nodes.OfType<ContactNodeBase>()
-            .Select(n =>
+            .Nodes.Select(n =>
                 -(
                     n.GibbsEnergyGradient.Tangential
                     + 0.5 * n.SurfaceDistance.Sum * Step.TangentialStress(n)
@@ -44,23 +43,33 @@ public class DissipationEqualityConstraint : GlobalEquationBase
     /// <inheritdoc />
     public override IEnumerable<(int, double)> Derivative()
     {
-        foreach (var node in State.Nodes)
+        foreach (var n in State.Nodes)
         {
-            yield return (Map.NormalDisplacement(node), -node.GibbsEnergyGradient.Normal);
             yield return (
-                Map.FluxToUpper(node),
-                -2
-                    * node.Particle.VacancyVolumeEnergy
-                    * node.SurfaceDistance.ToUpper
-                    / node.InterfaceDiffusionCoefficient.ToUpper
-                    * Step.FluxToUpper(node)
+                Map.NormalDisplacement(n),
+                -n.GibbsEnergyGradient.Normal - 0.5 * n.SurfaceDistance.Sum * Step.NormalStress(n)
             );
-
-            if (node is ContactNodeBase contactNode)
-                yield return (
-                    Map.TangentialDisplacement(contactNode),
-                    -node.GibbsEnergyGradient.Tangential
-                );
+            yield return (
+                Map.NormalStress(n),
+                -0.5 * n.SurfaceDistance.Sum * Step.NormalDisplacement(n)
+            );
+            yield return (
+                Map.TangentialDisplacement(n),
+                -n.GibbsEnergyGradient.Tangential
+                    - 0.5 * n.SurfaceDistance.Sum * Step.TangentialStress(n)
+            );
+            yield return (
+                Map.TangentialStress(n),
+                -0.5 * n.SurfaceDistance.Sum * Step.TangentialDisplacement(n)
+            );
+            yield return (
+                Map.FluxToUpper(n),
+                -2
+                    * n.Particle.VacancyVolumeEnergy
+                    * n.SurfaceDistance.ToUpper
+                    / n.InterfaceDiffusionCoefficient.ToUpper
+                    * Step.FluxToUpper(n)
+            );
         }
     }
 }

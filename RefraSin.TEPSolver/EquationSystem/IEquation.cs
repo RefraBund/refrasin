@@ -4,5 +4,5 @@ public interface IEquation
 {
     public double Value();
 
-    public IEnumerable<(int, double)> Derivative();
+    public IEnumerable<(int colIndex, double value)> Derivative();
 }

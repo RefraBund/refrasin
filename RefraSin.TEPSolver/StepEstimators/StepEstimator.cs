@@ -24,12 +24,16 @@ class StepEstimator : IStepEstimator
         {
             foreach (var node in particle.Nodes)
             {
-                if (node is not INodeContact)
+                if (node.Type is NodeType.Surface)
                 {
-                    stepVector.LambdaVolume(node, 0);
-                    stepVector.FluxToUpper(node, GuessFluxToUpper(node));
                     stepVector.NormalDisplacement(node, GuessNormalDisplacement(node));
+
+                    // stepVector.LambdaNormalStress(node, 1);
+                    // stepVector.LambdaTangentialStress(node, 1);
                 }
+
+                stepVector.FluxToUpper(node, GuessFluxToUpper(node));
+                stepVector.LambdaVolume(node, 1);
             }
         }
 
@@ -38,24 +42,18 @@ class StepEstimator : IStepEstimator
             var averageNormalDisplacement =
                 contact.FromNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement)
                 + contact.ToNodes.OfType<GrainBoundaryNode>().Average(GuessNormalDisplacement);
+
             stepVector.RadialDisplacement(contact, averageNormalDisplacement);
-            stepVector.AngleDisplacement(contact, 0);
-            stepVector.RotationDisplacement(contact, 0);
 
             foreach (var node in contact.FromNodes)
             {
-                stepVector.LambdaContactDistance(node, 0);
-                stepVector.LambdaContactDirection(node, 0);
+                stepVector.LambdaContactDistance(node, 1);
+                stepVector.LambdaContactDirection(node, 1);
 
-                stepVector.LambdaVolume(node, 0);
-                stepVector.FluxToUpper(node, GuessFluxToUpper(node));
                 stepVector.NormalDisplacement(node, averageNormalDisplacement);
-
-                stepVector.LambdaVolume(node.ContactedNode, 0);
-                stepVector.FluxToUpper(node.ContactedNode, GuessFluxToUpper(node.ContactedNode));
                 stepVector.NormalDisplacement(node.ContactedNode, averageNormalDisplacement);
 
-                if (node.Type == NodeType.Neck)
+                if (node.Type is NodeType.Neck)
                 {
                     stepVector.TangentialDisplacement(node, GuessTangentialDisplacement(node));
                     stepVector.TangentialDisplacement(

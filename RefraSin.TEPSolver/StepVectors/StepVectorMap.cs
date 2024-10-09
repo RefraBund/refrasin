@@ -17,13 +17,14 @@ public class StepVectorMap
 
             foreach (var node in particle.Nodes)
             {
-                if (node is not INodeContact)
+                AddUnknown(node.Id, Unknown.NormalDisplacement);
+                AddUnknown(node.Id, Unknown.TangentialDisplacement);
+                AddUnknown(node.Id, Unknown.FluxToUpper);
+                AddUnknown(node.Id, Unknown.LambdaVolume);
+                AddUnknown(node.Id, Unknown.NormalStress);
+                AddUnknown(node.Id, Unknown.TangentialStress);
+                if (node is SurfaceNode)
                 {
-                    AddUnknown(node.Id, Unknown.NormalDisplacement);
-                    AddUnknown(node.Id, Unknown.FluxToUpper);
-                    AddUnknown(node.Id, Unknown.LambdaVolume);
-                    AddUnknown(node.Id, Unknown.NormalStress);
-                    AddUnknown(node.Id, Unknown.TangentialStress);
                     AddUnknown(node.Id, Unknown.LambdaNormalStress);
                     AddUnknown(node.Id, Unknown.LambdaTangentialStress);
                 }
@@ -40,10 +41,6 @@ public class StepVectorMap
         {
             var startIndex = _index;
 
-            AddUnknown(contact.MergedId, Unknown.RadialDisplacement);
-            AddUnknown(contact.MergedId, Unknown.AngleDisplacement);
-            AddUnknown(contact.MergedId, Unknown.RotationDisplacement);
-
             foreach (var contactNode in contact.FromNodes)
             {
                 AddUnknown(contactNode.Id, Unknown.LambdaContactDistance);
@@ -59,21 +56,8 @@ public class StepVectorMap
                     Unknown.LambdaContactDirection
                 );
 
-                AddUnknown(contactNode.Id, Unknown.NormalDisplacement);
-                AddUnknown(contactNode.Id, Unknown.TangentialDisplacement);
-                AddUnknown(contactNode.Id, Unknown.FluxToUpper);
-                AddUnknown(contactNode.Id, Unknown.LambdaVolume);
-                AddUnknown(contactNode.Id, Unknown.NormalStress);
-                AddUnknown(contactNode.Id, Unknown.TangentialStress);
                 AddUnknown(contactNode.Id, Unknown.LambdaNormalStress);
                 AddUnknown(contactNode.Id, Unknown.LambdaTangentialStress);
-
-                AddUnknown(contactNode.ContactedNodeId, Unknown.NormalDisplacement);
-                AddUnknown(contactNode.ContactedNodeId, Unknown.TangentialDisplacement);
-                AddUnknown(contactNode.ContactedNodeId, Unknown.FluxToUpper);
-                AddUnknown(contactNode.ContactedNodeId, Unknown.LambdaVolume);
-                AddUnknown(contactNode.ContactedNodeId, Unknown.NormalStress);
-                AddUnknown(contactNode.ContactedNodeId, Unknown.TangentialStress);
                 LinkUnknown(
                     contactNode.Id,
                     contactNode.ContactedNodeId,
@@ -85,6 +69,10 @@ public class StepVectorMap
                     Unknown.LambdaTangentialStress
                 );
             }
+
+            AddUnknown(contact.MergedId, Unknown.RadialDisplacement);
+            AddUnknown(contact.MergedId, Unknown.AngleDisplacement);
+            AddUnknown(contact.MergedId, Unknown.RotationDisplacement);
 
             _contactBlocks[(contact.From.Id, contact.To.Id)] = (startIndex, _index - startIndex);
         }

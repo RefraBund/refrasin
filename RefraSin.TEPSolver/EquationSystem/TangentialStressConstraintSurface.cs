@@ -13,5 +13,8 @@ public class TangentialStressConstraintSurface : NodeEquationBase<SurfaceNode>
     public override double Value() => Step.TangentialStress(Node);
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (Map.TangentialStress(Node), 1);
+    }
 }

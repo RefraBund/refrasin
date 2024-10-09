@@ -14,7 +14,7 @@ public class NormalStressDerivative : NodeEquationBase<NodeBase>
     public override double Value()
     {
         var gibbsTerm =
-            0.5
+            -0.5
             * Node.SurfaceDistance.Sum
             * Step.NormalDisplacement(Node)
             * (1 + Step.LambdaDissipation());
@@ -33,7 +33,7 @@ public class NormalStressDerivative : NodeEquationBase<NodeBase>
             ? Step.LambdaNormalStress(contactNode) * (contactNode.IsParentsNode ? 1 : -1)
             : 0;
 
-        return -gibbsTerm
+        return gibbsTerm
             + constraintsTerm
             + horizontalTerm
             + verticalTerm
@@ -42,5 +42,35 @@ public class NormalStressDerivative : NodeEquationBase<NodeBase>
     }
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (
+            Map.NormalDisplacement(Node),
+            -0.5 * Node.SurfaceDistance.Sum * (1 + Step.LambdaDissipation())
+        );
+        yield return (
+            Map.LambdaDissipation(),
+            -0.5 * Node.SurfaceDistance.Sum * Step.NormalDisplacement(Node)
+        );
+        yield return (
+            Map.LambdaHorizontalForceBalance(Particle),
+            Cos(Node.Coordinates.Phi + (Angle.Half - Node.RadiusNormalAngle.ToUpper))
+        );
+        yield return (
+            Map.LambdaVerticalForceBalance(Particle),
+            Sin(Node.Coordinates.Phi + (Angle.Half - Node.RadiusNormalAngle.ToUpper))
+        );
+        yield return (
+            Map.LambdaTorqueBalance(Particle),
+            Sin(Node.RadiusNormalAngle.ToUpper) * Node.Coordinates.R
+        );
+        if (Node is ContactNodeBase contactNode)
+        {
+            yield return (Map.LambdaNormalStress(Node), contactNode.IsParentsNode ? 1 : -1);
+        }
+        else
+        {
+            yield return (Map.LambdaNormalStress(Node), 1);
+        }
+    }
 }

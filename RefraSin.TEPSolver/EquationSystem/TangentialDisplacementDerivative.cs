@@ -3,26 +3,28 @@ using RefraSin.TEPSolver.StepVectors;
 
 namespace RefraSin.TEPSolver.EquationSystem;
 
-public class TangentialDisplacementDerivative : NodeEquationBase<ContactNodeBase>
+public class TangentialDisplacementDerivative : NodeEquationBase<NodeBase>
 {
     /// <inheritdoc />
-    public TangentialDisplacementDerivative(ContactNodeBase node, StepVector step)
+    public TangentialDisplacementDerivative(NodeBase node, StepVector step)
         : base(node, step) { }
 
     /// <inheritdoc />
     public override double Value()
     {
         var gibbsTerm =
-            (
+            -(
                 Node.GibbsEnergyGradient.Tangential
                 + 0.5 * Node.SurfaceDistance.Sum * Step.TangentialStress(Node)
             ) * (1 + Step.LambdaDissipation());
         var requiredConstraintsTerm = Node.VolumeGradient.Tangential * Step.LambdaVolume(Node);
-        var contactTerm =
-            -Node.ContactDistanceGradient.Tangential * Step.LambdaContactDistance(Node)
-            - Node.ContactDirectionGradient.Tangential * Step.LambdaContactDirection(Node);
+        var contactTerm = Node is ContactNodeBase contactNode
+            ? -contactNode.ContactDistanceGradient.Tangential * Step.LambdaContactDistance(Node)
+                - contactNode.ContactDirectionGradient.Tangential
+                    * Step.LambdaContactDirection(Node)
+            : 0;
 
-        return -gibbsTerm + requiredConstraintsTerm + contactTerm;
+        return gibbsTerm + requiredConstraintsTerm + contactTerm;
     }
 
     /// <inheritdoc />
@@ -37,10 +39,21 @@ public class TangentialDisplacementDerivative : NodeEquationBase<ContactNodeBase
         );
         yield return (
             Map.TangentialStress(Node),
-            -0.5 * Node.SurfaceDistance.Sum * Step.LambdaDissipation()
+            -0.5 * Node.SurfaceDistance.Sum * (1 + Step.LambdaDissipation())
         );
+
         yield return (Map.LambdaVolume(Node), Node.VolumeGradient.Tangential);
-        yield return (Map.LambdaContactDistance(Node), -Node.ContactDistanceGradient.Tangential);
-        yield return (Map.LambdaContactDirection(Node), -Node.ContactDirectionGradient.Tangential);
+
+        if (Node is ContactNodeBase contactNode)
+        {
+            yield return (
+                Map.LambdaContactDistance(Node),
+                -contactNode.ContactDistanceGradient.Tangential
+            );
+            yield return (
+                Map.LambdaContactDirection(Node),
+                -contactNode.ContactDirectionGradient.Tangential
+            );
+        }
     }
 }

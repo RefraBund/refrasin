@@ -13,5 +13,8 @@ public class NormalStressConstraintSurface : NodeEquationBase<SurfaceNode>
     public override double Value() => Step.NormalStress(Node);
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (Map.NormalStress(Node), 1);
+    }
 }

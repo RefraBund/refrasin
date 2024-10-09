@@ -13,7 +13,7 @@ public class NormalDisplacementDerivative : NodeEquationBase<NodeBase>
     public override double Value()
     {
         var gibbsTerm =
-            (
+            -(
                 Node.GibbsEnergyGradient.Normal
                 + 0.5 * Node.SurfaceDistance.Sum * Step.NormalStress(Node)
             ) * (1 + Step.LambdaDissipation());
@@ -30,7 +30,7 @@ public class NormalDisplacementDerivative : NodeEquationBase<NodeBase>
                     * Step.LambdaContactDirection(contactNode);
         }
 
-        return -gibbsTerm + requiredConstraintsTerm + contactTerm;
+        return gibbsTerm + requiredConstraintsTerm + contactTerm;
     }
 
     /// <inheritdoc />
@@ -45,8 +45,9 @@ public class NormalDisplacementDerivative : NodeEquationBase<NodeBase>
         );
         yield return (
             Map.NormalStress(Node),
-            -0.5 * Node.SurfaceDistance.Sum * Step.LambdaDissipation()
+            -0.5 * Node.SurfaceDistance.Sum * (1 + Step.LambdaDissipation())
         );
+
         yield return (Map.LambdaVolume(Node), Node.VolumeGradient.Normal);
 
         if (Node is ContactNodeBase contactNode)

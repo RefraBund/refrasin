@@ -35,8 +35,7 @@ public class EquationSystem
         foreach (var n in p.Nodes)
         {
             yield return new NormalDisplacementDerivative(n, StepVector);
-            if (n is ContactNodeBase cn)
-                yield return new TangentialDisplacementDerivative(cn, StepVector);
+            yield return new TangentialDisplacementDerivative(n, StepVector);
             yield return new FluxDerivative(n, StepVector);
             yield return new VolumeBalanceConstraint(n, StepVector);
             yield return new NormalStressDerivative(n, StepVector);
@@ -67,6 +66,7 @@ public class EquationSystem
 
         yield return new ContactDistanceDerivative(contact, StepVector);
         yield return new ContactDirectionDerivative(contact, StepVector);
+        yield return new ParticleRotationDerivative(contact, StepVector);
     }
 
     private IEnumerable<IEquation> YieldGlobalEquations()
@@ -107,10 +107,17 @@ public class EquationSystem
     public Matrix<double> ParticleBlockJacobian(IParticle particle)
     {
         var equations = ParticleBlockEquations(particle);
+        var block = StepVector.StepVectorMap[particle];
+        var endIndex = block.start + block.length;
         return Matrix<double>.Build.SparseOfIndexed(
             equations.Count,
-            equations.Count,
-            equations.SelectMany((e, i) => e.Derivative().Select(c => (i, c.Item1, c.Item2)))
+            block.length,
+            equations.SelectMany(
+                (e, i) =>
+                    e.Derivative()
+                        .Where(c => c.colIndex >= block.start && c.colIndex < endIndex)
+                        .Select(c => (i, c.Item1 - block.start, c.Item2))
+            )
         );
     }
 
@@ -122,22 +129,40 @@ public class EquationSystem
     public Matrix<double> ContactBlockJacobian(IParticleContactEdge contact)
     {
         var equations = ContactBlockEquations(contact);
+        var block = StepVector.StepVectorMap[contact];
+        var endIndex = block.start + block.length;
         return Matrix<double>.Build.SparseOfIndexed(
             equations.Count,
-            equations.Count,
-            equations.SelectMany((e, i) => e.Derivative().Select(c => (i, c.Item1, c.Item2)))
+            block.length,
+            equations.SelectMany(
+                (e, i) =>
+                    e.Derivative()
+                        .Where(c => c.colIndex >= block.start && c.colIndex < endIndex)
+                        .Select(c => (i, c.colIndex - block.start, c.value))
+            )
         );
     }
 
     public Vector<double> GlobalBlockLagrangian() =>
         Vector<double>.Build.DenseOfEnumerable(GlobalBlockEquations.Select(e => e.Value()));
 
-    public Matrix<double> GlobalBlockJacobian() =>
-        Matrix<double>.Build.SparseOfIndexed(
+    public Matrix<double> GlobalBlockJacobian()
+    {
+        var endIndex = StepVector.StepVectorMap.GlobalStart + StepVector.StepVectorMap.GlobalLength;
+        return Matrix<double>.Build.SparseOfIndexed(
             GlobalBlockEquations.Count,
             GlobalBlockEquations.Count,
             GlobalBlockEquations.SelectMany(
-                (e, i) => e.Derivative().Select(c => (i, c.Item1, c.Item2))
+                (e, i) =>
+                    e.Derivative()
+                        .Where(c =>
+                            c.colIndex >= StepVector.StepVectorMap.GlobalStart
+                            && c.colIndex < endIndex
+                        )
+                        .Select(c =>
+                            (i, c.colIndex - StepVector.StepVectorMap.GlobalLength, c.value)
+                        )
             )
         );
+    }
 }

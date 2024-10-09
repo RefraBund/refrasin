@@ -71,6 +71,12 @@ public class StepVector : DenseVector
     public void NormalDisplacement(INode node, double value) =>
         this[StepVectorMap.NormalDisplacement(node)] = value;
 
+    public void NormalStress(INode node, double value) =>
+        this[StepVectorMap.NormalStress(node)] = value;
+
+    public void TangentialStress(INode node, double value) =>
+        this[StepVectorMap.TangentialStress(node)] = value;
+
     public void FluxToUpper(INode node, double value) =>
         this[StepVectorMap.FluxToUpper(node)] = value;
 

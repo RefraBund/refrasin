@@ -14,5 +14,9 @@ public class NormalStressConstraintContact : NodeEquationBase<ContactNodeBase>
         Step.NormalStress(Node) - Step.NormalStress(Node.ContactedNode);
 
     /// <inheritdoc />
-    public override IEnumerable<(int, double)> Derivative() => throw new NotImplementedException();
+    public override IEnumerable<(int, double)> Derivative()
+    {
+        yield return (Map.NormalStress(Node), 1);
+        yield return (Map.NormalStress(Node.ContactedNode), -1);
+    }
 }
