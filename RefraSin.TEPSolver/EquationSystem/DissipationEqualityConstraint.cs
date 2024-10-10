@@ -14,17 +14,14 @@ public class DissipationEqualityConstraint : GlobalEquationBase
     {
         var dissipationNormal = State
             .Nodes.Select(n =>
-                -(n.GibbsEnergyGradient.Normal + 0.5 * n.SurfaceDistance.Sum * Step.NormalStress(n))
-                * Step.NormalDisplacement(n)
+                (-n.GibbsEnergyGradient.Normal + Step.NormalStress(n)) * Step.NormalDisplacement(n)
             )
             .Sum();
 
         var dissipationTangential = State
             .Nodes.Select(n =>
-                -(
-                    n.GibbsEnergyGradient.Tangential
-                    + 0.5 * n.SurfaceDistance.Sum * Step.TangentialStress(n)
-                ) * Step.TangentialDisplacement(n)
+                (-n.GibbsEnergyGradient.Tangential + Step.TangentialStress(n))
+                * Step.TangentialDisplacement(n)
             )
             .Sum();
 
@@ -47,21 +44,14 @@ public class DissipationEqualityConstraint : GlobalEquationBase
         {
             yield return (
                 Map.NormalDisplacement(n),
-                -n.GibbsEnergyGradient.Normal - 0.5 * n.SurfaceDistance.Sum * Step.NormalStress(n)
+                -n.GibbsEnergyGradient.Normal + Step.NormalStress(n)
             );
-            yield return (
-                Map.NormalStress(n),
-                -0.5 * n.SurfaceDistance.Sum * Step.NormalDisplacement(n)
-            );
+            yield return (Map.NormalStress(n), Step.NormalDisplacement(n));
             yield return (
                 Map.TangentialDisplacement(n),
-                -n.GibbsEnergyGradient.Tangential
-                    - 0.5 * n.SurfaceDistance.Sum * Step.TangentialStress(n)
+                -n.GibbsEnergyGradient.Tangential + Step.TangentialStress(n)
             );
-            yield return (
-                Map.TangentialStress(n),
-                -0.5 * n.SurfaceDistance.Sum * Step.TangentialDisplacement(n)
-            );
+            yield return (Map.TangentialStress(n), Step.TangentialDisplacement(n));
             yield return (
                 Map.FluxToUpper(n),
                 -2

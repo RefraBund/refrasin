@@ -13,11 +13,7 @@ public class TangentialStressDerivative : NodeEquationBase<NodeBase>
     /// <inheritdoc />
     public override double Value()
     {
-        var gibbsTerm =
-            -0.5
-            * Node.SurfaceDistance.Sum
-            * Step.TangentialDisplacement(Node)
-            * (1 + Step.LambdaDissipation());
+        var gibbsTerm = Step.TangentialDisplacement(Node) * (1 + Step.LambdaDissipation());
         var constraintsTerm = Node.Type == NodeType.Surface ? Step.LambdaTangentialStress(Node) : 0;
         var horizontalTerm =
             Cos(Node.Coordinates.Phi + (Angle.Half - Node.RadiusTangentAngle.ToUpper))
@@ -44,14 +40,8 @@ public class TangentialStressDerivative : NodeEquationBase<NodeBase>
     /// <inheritdoc />
     public override IEnumerable<(int, double)> Derivative()
     {
-        yield return (
-            Map.TangentialDisplacement(Node),
-            -0.5 * Node.SurfaceDistance.Sum * (1 + Step.LambdaDissipation())
-        );
-        yield return (
-            Map.LambdaDissipation(),
-            -0.5 * Node.SurfaceDistance.Sum * Step.TangentialDisplacement(Node)
-        );
+        yield return (Map.TangentialDisplacement(Node), 1 + Step.LambdaDissipation());
+        yield return (Map.LambdaDissipation(), Step.TangentialDisplacement(Node));
         yield return (
             Map.LambdaHorizontalForceBalance(Particle),
             Cos(Node.Coordinates.Phi + (Angle.Half - Node.RadiusTangentAngle.ToUpper))
