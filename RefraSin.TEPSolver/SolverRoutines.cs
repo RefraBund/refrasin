@@ -29,11 +29,12 @@ public record SolverRoutines(
             [
                 // new InstabilityDetector()
             ],
-            new TearingLagrangianRootFinder(
-                new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4),
-                new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4),
-                new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4)
-            ),
+            new KaczmarzLagrangianRootFinder(stepBreakFactor: 0.01),
+            // new TearingLagrangianRootFinder(
+            //     new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4),
+            //     new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4),
+            //     new NewtonRaphsonRootFinder(new LUSolver(), absoluteTolerance: 1e-4)
+            // ),
             new DefaultNormalizer(),
             new MaximumDisplacementAngleStepWidthController(),
             [new StepBackStateRecoverer()],
